@@ -1,0 +1,79 @@
+import { useState, useEffect } from 'react';
+import { useNavigate, Link as RouterLink, Navigate } from 'react-router-dom';
+
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Container,
+  Box,
+  Card,
+  CardContent,
+  Avatar,
+  Fab,
+} from "@mui/material";
+
+import LogoutIcon from '@mui/icons-material/Logout';
+import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
+import { useAuth } from '../../contextos/AuthContexto';
+
+const AgendamentoConfirmado = () => {
+  const navegar = useNavigate();
+  const { usuario, sair } = useAuth();
+  const handleSair = () => {sair(); navegar('/login');};
+  const inicialNome = usuario?.nome?.charAt(0)?.toUpperCase() || 'U';
+
+  return (
+    <>
+    
+      <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
+        <AppBar position="static" sx={{ background: 'linear-gradient(135deg, #1a3c6e 0%, #2e6da4 100%)',}}>
+          <Toolbar sx={{ justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box
+                component="img"
+                src="/logo.png"
+                alt="ConectaDoa"
+                sx={{ height: 40, filter: 'brightness(0) invert(1)' }}
+              />
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Avatar sx={{ bgcolor: 'secondary.main', color: 'primary.main', fontWeight: 700 }}>
+                {inicialNome}
+              </Avatar>
+              <Typography variant="body1" sx={{ display: { xs: 'none', sm: 'block' } }}>
+                {usuario?.nome}
+              </Typography>
+              <Button
+                id="botao-sair"
+                color="inherit"
+                startIcon={<LogoutIcon />}
+                onClick={handleSair}
+                sx={{ ml: 1 }}
+              >
+                Sair
+              </Button>
+            </Box>
+          </Toolbar>
+        </AppBar>
+
+        
+        <Container sx={{ py: 3 }}>
+          <Box sx={{ display: "flex", justifyContent: "center", textAlign: "center", alignItems: "center", color:"#160f75", gap: 2 }}>
+            <Box> 
+                <Typography variant="h3" gutterBottom>
+                Conectando quem quer ajudar a quem mais precisa
+                </Typography>
+                <Box sx={{ mt: 2, py: 2, alignContent:"center", display:"flex", justifyContent:"center"}}>
+                </Box>
+            </Box>    
+          </Box>
+        </Container>
+        
+      </Box>
+    </>
+  );
+}
+
+export default AgendamentoConfirmado;

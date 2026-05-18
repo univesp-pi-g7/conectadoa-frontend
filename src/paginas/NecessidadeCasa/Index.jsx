@@ -37,15 +37,11 @@ const NecessidadesCasa = () => {
   return (
     <>
         <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
-            {/* Barra superior */}
             <AppBar
             position="static"
-            sx={{
-                background: 'linear-gradient(135deg, #1a3c6e 0%, #2e6da4 100%)',
-            }}
-            >
+            sx={{ background: 'linear-gradient(135deg, #1a3c6e 0%, #2e6da4 100%)',
+            }}>
             <Toolbar sx={{ justifyContent: 'space-between' }}>
-                {/* Logo */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Box
                     component="img"
@@ -55,7 +51,6 @@ const NecessidadesCasa = () => {
                 />
                 </Box>
 
-                {/* Área do usuário */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Avatar sx={{ bgcolor: 'secondary.main', color: 'primary.main', fontWeight: 700 }}>
                     {inicialNome}
@@ -84,8 +79,7 @@ const NecessidadesCasa = () => {
                         Conectando quem quer ajudar a quem mais precisa
                         </Typography>
                         <Box sx={{ mt: 2, py: 2, alignContent:"center", display:"flex", justifyContent:"center"}}>
-                    </Box>
-              
+                    </Box>             
                         
                     <Box
                         component="img"

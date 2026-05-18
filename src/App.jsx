@@ -30,6 +30,8 @@ import Doacao from './paginas/Doacao';
 import Home from './paginas/Home';
 import CasaPassagen from './paginas/CasaPassagen';
 import NecessidadeCasa from './paginas/NecessidadeCasa';
+import ConfirmarAgendamento from './paginas/ConfirmarAgendamento';
+import AgendamentoConfirmado from './paginas/AgendamentoConfirmado';
 
 const App = () => {
   return (
@@ -49,6 +51,22 @@ const App = () => {
           element={
             <RotaProtegida>
               <Dashboard />
+            </RotaProtegida>
+          }
+        />
+        <Route
+          path="/ConfirmarAgendamento"
+          element={
+            <RotaProtegida>
+              <ConfirmarAgendamento />
+            </RotaProtegida>
+          }
+        />
+        <Route
+          path="/AgendamentoConfirmado"
+          element={
+            <RotaProtegida>
+              <AgendamentoConfirmado />
             </RotaProtegida>
           }
         />

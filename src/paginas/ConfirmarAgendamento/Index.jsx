@@ -18,7 +18,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
 import { useAuth } from '../../contextos/AuthContexto';
 
-const CasaPassagen = () => {
+const ConfirmarAgendamento = () => {
   const navegar = useNavigate();
   const { usuario, sair } = useAuth();
   const handleSair = () => {sair(); navegar('/login');};
@@ -39,6 +39,16 @@ const CasaPassagen = () => {
               />
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Button
+                    variant="contained"
+                    color="#ece7e7"
+                    size="large"
+                    startIcon={<HomeIcon />}
+                    sx={{ mt: 4 }}
+                    onClick={() => navegar("/")}
+                    >
+                    Página Inicial
+                </Button>
               <Avatar sx={{ bgcolor: 'secondary.main', color: 'primary.main', fontWeight: 700 }}>
                 {inicialNome}
               </Avatar>
@@ -58,7 +68,7 @@ const CasaPassagen = () => {
           </Toolbar>
         </AppBar>
 
-        {/* Conteúdo principal */}
+        
         <Container sx={{ py: 3 }}>
           <Box sx={{ display: "flex", justifyContent: "center", textAlign: "center", alignItems: "center", color:"#160f75", gap: 2 }}>
           <Box> 
@@ -92,38 +102,12 @@ const CasaPassagen = () => {
                 Casa de Passagem Geise Valente
                 </Typography>
             </Box> 
-            
-            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 4, padding: 4  }}>
-                <Box component="img" src="/LogoCasa.png" alt="Casa de Passagem Geise Valente" 
-                    sx={{
-                    height: "230px",
-                    border: "2px solid #cfe2f5", 
-                    borderRadius: "8px",          
-                    padding: "4px",               
-                    backgroundColor: "#fff",      
-                    boxShadow: "4px 4px 10px rgba(0,0,0,0.3)",
-                    }}
-                />
-                <Card sx={{ maxWidth: 1000 }}>
-                    <CardContent>
-                        <Typography>
-                            A Casa de Passagem Geise Valente não oferece apenas abrigo — oferece dignidade, cuidado, amor e uma nova chance.  
-                            Cada dia é marcado pela transformação de vidas: pessoas que chegam fragilizadas e encontram força para partir de cabeça erguida.
-                            É essa mudança que impulsiona a missão da Casa de Passagem Geise Valente e dá sentido a cada gesto de solidariedade.
-                            Para que mais vidas possam ser transformadas, precisamos de você. Venha fazer parte desta corrente do bem.
-                            Agende sua doação e faça a diferença!
-                        </Typography>
-                        <Button variant="contained" color="primary" sx={{ mt: 2 }} component={RouterLink} to="/doacao">
-                            Necessidades da Instituição
-                        </Button>
-                    </CardContent>
-                </Card>
-                </Box>
             </Box>
         </Container>
       </Box>
+      
     </>
   );
 }
 
-export default CasaPassagen;
+export default ConfirmarAgendamento;
