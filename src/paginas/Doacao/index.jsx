@@ -1,3 +1,27 @@
+import React, { useState } from "react";
+import { useNavigate, Link as RouterLink, Navigate } from 'react-router-dom';
+
+// Componentes MUI
+import {
+  Box,
+  Paper,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  Link,
+  CircularProgress,
+  InputAdornment,
+  IconButton,
+} from '@mui/material';
+
+// Ícones MUI
+import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+
 const Doacao = () => {
     const [doacao, setDoacao] = useState({
         nome: "",
@@ -6,7 +30,8 @@ const Doacao = () => {
         quantidade: "",
     })
 
-    const handleFazerDoacao = () => {
+    const handleFazerDoacao = (e) => {
+        e.preventDefault();
         try{
             criarDoacao(doacao)
         }catch(error){

@@ -27,6 +27,9 @@ import Login from './paginas/Login';
 import Registro from './paginas/Registro';
 import Dashboard from './paginas/Dashboard';
 import Doacao from './paginas/Doacao';
+import Home from './paginas/Home';
+import CasaPassagen from './paginas/CasaPassagen';
+import NecessidadeCasa from './paginas/NecessidadeCasa';
 
 const App = () => {
   return (
@@ -37,7 +40,8 @@ const App = () => {
       <Routes>
         {/* Rotas públicas — acessíveis sem login */}
         <Route path="/login" element={<Login />} />
-        <Route path="/registro" element={<Registro />} />
+        <Route path="/registro" element={<Registro />}/>
+        <Route path="/home" element={<Home />}/>
 
         {/* Rota protegida — requer autenticação */}
         <Route
@@ -45,6 +49,22 @@ const App = () => {
           element={
             <RotaProtegida>
               <Dashboard />
+            </RotaProtegida>
+          }
+        />
+        <Route
+          path="/casapassagen"
+          element={
+            <RotaProtegida>
+              <CasaPassagen />
+            </RotaProtegida>
+          }
+        />
+        <Route
+          path="/NecessidadeCasa"
+          element={
+            <RotaProtegida>
+              <NecessidadeCasa />
             </RotaProtegida>
           }
         />
@@ -68,6 +88,7 @@ const App = () => {
           }
         />
       </Routes>
+      
     </ThemeProvider>
   );
 };

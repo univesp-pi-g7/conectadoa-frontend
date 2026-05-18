@@ -5,7 +5,7 @@
  * TODO: implementar dashboard completo com listagem de doações,
  * necessidades do centro e funcionalidades do perfil do usuário.
  */
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link as RouterLink, Navigate} from 'react-router-dom';
 
 // Componentes MUI
 import {
@@ -16,6 +16,7 @@ import {
   AppBar,
   Toolbar,
   Avatar,
+  Link,
 } from '@mui/material';
 
 // Ícones MUI
@@ -132,7 +133,8 @@ const Dashboard = () => {
               - Painel administrativo (para admins)
           */}
 
-          <Button
+          <Button 
+            component={RouterLink} to="/CasaPassagen"
             variant="contained"
             size="large"
             startIcon={<VolunteerActivismIcon />}
