@@ -33,6 +33,9 @@ import NecessidadeCasa from './paginas/NecessidadeCasa';
 import ConfirmarAgendamento from './paginas/ConfirmarAgendamento';
 import AgendamentoConfirmado from './paginas/AgendamentoConfirmado';
 
+import AdminDashboard from './paginas/AdminDashboard';
+import AdminItens from './paginas/AdminItens';
+
 const App = () => {
   return (
     <ThemeProvider theme={tema}>
@@ -98,10 +101,18 @@ const App = () => {
 
         {/* Rota protegida — requer perfil de administrador */}
         <Route
-          path="/admin"
+          path="/admin-doacoes"
           element={
             <RotaProtegida apenasAdmin>
-              <Dashboard />
+              <AdminDashboard />
+            </RotaProtegida>
+          }
+        />
+        <Route
+          path="/admin-itens"
+          element={
+            <RotaProtegida apenasAdmin>
+              <AdminItens />
             </RotaProtegida>
           }
         />
