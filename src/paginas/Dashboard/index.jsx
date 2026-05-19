@@ -1,11 +1,5 @@
-/**
- * Página Dashboard — /
- *
- * Página principal após o login. Exibe uma saudação e botão de sair.
- * TODO: implementar dashboard completo com listagem de doações,
- * necessidades do centro e funcionalidades do perfil do usuário.
- */
-import { useNavigate, Link as RouterLink, Navigate} from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 
 // Componentes MUI
 import {
@@ -13,149 +7,251 @@ import {
   Typography,
   Button,
   Paper,
-  AppBar,
-  Toolbar,
-  Avatar,
-  Link,
+  Grid,
+  CircularProgress,
+  Chip,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
 } from '@mui/material';
 
 // Ícones MUI
-import LogoutIcon from '@mui/icons-material/Logout';
 import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
+import HistoryIcon from '@mui/icons-material/History';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import PendingActionsIcon from '@mui/icons-material/PendingActions';
+import CancelIcon from '@mui/icons-material/Cancel';
 
-// Contexto de autenticação
+// Componentes do Sistema
+import Navbar from '../../componentes/Navbar';
+
+// Contexto e Serviços
 import { useAuth } from '../../contextos/AuthContexto';
+import { listarMinhasDoacoes } from '../../servicos/doacaoServico';
+import { listarItens } from '../../servicos/itemServico';
 
 const Dashboard = () => {
-  const navegar = useNavigate();
-  const { usuario, sair } = useAuth();
+  const { usuario } = useAuth();
+  const [doacoes, setDoacoes] = useState([]);
+  const [itensMap, setItensMap] = useState({});
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState("");
 
-  /**
-   * Faz logout e redireciona para a tela de login
-   */
-  const handleSair = () => {
-    sair();
-    navegar('/login');
+  useEffect(() => {
+    const carregarDados = async () => {
+      try {
+        // Busca doações e catálogo de itens em paralelo
+        const [doacoesDados, catalogoItens] = await Promise.all([
+          listarMinhasDoacoes(),
+          listarItens()
+        ]);
+
+        // Mapeia IDs de itens para nomes legíveis
+        const mapa = {};
+        catalogoItens.forEach(item => {
+          mapa[item.id] = item.nome_item;
+        });
+
+        setItensMap(mapa);
+        setDoacoes(doacoesDados);
+      } catch (err) {
+        setErro("Não foi possível carregar seu histórico de doações.");
+      } finally {
+        setCarregando(false);
+      }
+    };
+
+    carregarDados();
+  }, []);
+
+  const getStatusChip = (status) => {
+    switch (status) {
+      case 'recebida':
+        return (
+          <Chip 
+            icon={<CheckCircleIcon />} 
+            label="Recebida" 
+            color="success" 
+            variant="outlined" 
+            size="small" 
+          />
+        );
+      case 'rejeitada':
+        return (
+          <Chip 
+            icon={<CancelIcon />} 
+            label="Rejeitada" 
+            color="error" 
+            variant="outlined" 
+            size="small" 
+          />
+        );
+      default:
+        return (
+          <Chip 
+            icon={<PendingActionsIcon />} 
+            label="Agendada" 
+            color="warning" 
+            variant="outlined" 
+            size="small" 
+          />
+        );
+    }
   };
 
-  // Pega a primeira letra do nome para exibir no avatar
-  const inicialNome = usuario?.nome?.charAt(0)?.toUpperCase() || 'U';
+  const formatarData = (dataString) => {
+    if (!dataString) return "";
+    const partes = dataString.split('-');
+    if (partes.length === 3) {
+      return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+    return dataString;
+  };
 
   return (
-    <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
-      {/* Barra superior */}
-      <AppBar
-        position="static"
-        sx={{
-          background: 'linear-gradient(135deg, #1a3c6e 0%, #2e6da4 100%)',
-        }}
-      >
-        <Toolbar sx={{ justifyContent: 'space-between' }}>
-          {/* Logo e nome */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box
-              component="img"
-              src="/logo.png"
-              alt="ConectaDoa"
-              sx={{ height: 40, filter: 'brightness(0) invert(1)' }}
-            />
-          </Box>
+    <Box sx={{ minHeight: '100vh', backgroundColor: '#f8f9fa', pb: { xs: 10, sm: 3 } }}>
+      {/* Barra superior (Navbar) */}
+      <Navbar />
 
-          {/* Área do usuário */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Avatar sx={{ bgcolor: 'secondary.main', color: 'primary.main', fontWeight: 700 }}>
-              {inicialNome}
-            </Avatar>
-            <Typography variant="body1" sx={{ display: { xs: 'none', sm: 'block' } }}>
-              {usuario?.nome}
-            </Typography>
-            <Button
-              id="botao-sair"
-              color="inherit"
-              startIcon={<LogoutIcon />}
-              onClick={handleSair}
-              sx={{ ml: 1 }}
+      <Box sx={{ p: { xs: 2, sm: 4 } }}>
+        <Grid container spacing={3} justifyContent="center" maxWidth="lg" sx={{ mx: 'auto' }}>
+          
+          {/* Card de boas-vindas */}
+          <Grid item xs={12} md={5}>
+            <Paper
+              elevation={3}
+              sx={{
+                padding: { xs: 3, sm: 4 },
+                textAlign: 'center',
+                borderRadius: 4,
+                border: '1px solid #e0e0e0',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.03)'
+              }}
             >
-              Sair
-            </Button>
-          </Box>
-        </Toolbar>
-      </AppBar>
+              {/* Logo */}
+              <Box
+                component="img"
+                src="/logo.png"
+                alt="ConectaDoa"
+                sx={{ width: 160, mb: 2 }}
+              />
 
-      {/* Conteúdo principal */}
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: 'calc(100vh - 64px)',
-          padding: 3,
-        }}
-      >
-        {/* Card de boas-vindas */}
-        <Paper
-          elevation={3}
-          sx={{
-            padding: { xs: 4, sm: 6 },
-            textAlign: 'center',
-            maxWidth: 500,
-          }}
-        >
-          {/* Logo */}
-          <Box
-            component="img"
-            src="/logo.png"
-            alt="ConectaDoa"
-            sx={{ width: 200, mb: 3 }}
-          />
+              <Typography
+                variant="h5"
+                component="h1"
+                sx={{ mb: 1, color: '#1a3c6e', fontWeight: 'bold' }}
+              >
+                Olá, {usuario?.nome}!
+              </Typography>
 
-          <Typography
-            variant="h4"
-            component="h1"
-            sx={{ mb: 1, color: 'primary.main' }}
-          >
-            Olá, {usuario?.nome}!
-          </Typography>
+              <Typography
+                variant="body2"
+                sx={{ mb: 3, color: 'text.secondary' }}
+              >
+                Bem-vindo(a) ao ConectaDoa — Sua Ponte Para Ajudar.
+              </Typography>
 
-          <Typography
-            variant="body1"
-            sx={{ mb: 3, color: 'text.secondary' }}
-          >
-            Bem-vindo(a) ao ConectaDoa — Sua Ponte Para Ajudar.
-          </Typography>
+              <Button 
+                component={RouterLink} to="/CasaPassagen"
+                variant="contained"
+                size="large"
+                startIcon={<VolunteerActivismIcon />}
+                fullWidth
+                sx={{
+                  py: 1.5,
+                  borderRadius: 3,
+                  fontWeight: 'bold',
+                  background: 'linear-gradient(135deg, #1a3c6e 0%, #2e6da4 100%)',
+                  boxShadow: '0 4px 15px rgba(26, 60, 110, 0.4)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #0f2744 0%, #1a3c6e 100%)',
+                  },
+                }}
+              >
+                Quero Ajudar Agora!
+              </Button>
 
-          {/* TODO: implementar dashboard completo */}
-          {/* Aqui serão adicionados:
-              - Listagem de necessidades do centro de acolhimento
-              - Histórico de doações do usuário
-              - Agendamento de novas doações
-              - Painel administrativo (para admins)
-          */}
+              <Typography
+                variant="caption"
+                sx={{ display: 'block', mt: 3, color: 'text.secondary' }}
+              >
+                Perfil: {usuario?.tipo_usuario === 'admin' ? 'Administrador' : 'Doador'}
+              </Typography>
+            </Paper>
+          </Grid>
 
-          <Button 
-            component={RouterLink} to="/CasaPassagen"
-            variant="contained"
-            size="large"
-            startIcon={<VolunteerActivismIcon />}
-            sx={{
-              background: 'linear-gradient(135deg, #1a3c6e 0%, #2e6da4 100%)',
-              '&:hover': {
-                background: 'linear-gradient(135deg, #0f2744 0%, #1a3c6e 100%)',
-              },
-            }}
-          >
-            CLIQUE AQUI PARA AJUDAR
-          </Button>
+          {/* Histórico de doações */}
+          <Grid item xs={12} md={7}>
+            <Paper
+              elevation={3}
+              sx={{
+                padding: { xs: 3, sm: 4 },
+                borderRadius: 4,
+                border: '1px solid #e0e0e0',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.03)',
+                minHeight: '260px'
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+                <HistoryIcon color="primary" />
+                <Typography variant="h6" fontWeight="bold" color="#1a3c6e">
+                  Minhas Doações Agendadas
+                </Typography>
+              </Box>
 
-          {/* Tipo do usuário */}
-          <Typography
-            variant="caption"
-            sx={{ display: 'block', mt: 3, color: 'text.secondary' }}
-          >
-            Perfil: {usuario?.tipo_usuario === 'admin' ? 'Administrador' : 'Doador'}
-          </Typography>
-        </Paper>
+              {carregando ? (
+                <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+                  <CircularProgress color="primary" />
+                </Box>
+              ) : erro ? (
+                <Typography variant="body2" color="error" align="center">
+                  {erro}
+                </Typography>
+              ) : doacoes.length === 0 ? (
+                <Box sx={{ textAlign: 'center', py: 4, px: 2 }}>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    Você ainda não fez nenhum agendamento.
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" display="block">
+                    Escolha uma causa no Mural de Ajuda para começar!
+                  </Typography>
+                </Box>
+              ) : (
+                <List sx={{ p: 0 }}>
+                  {doacoes.map((doacao, index) => (
+                    <Box key={doacao.id}>
+                      <ListItem sx={{ px: 0, py: 2, display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                          <Typography variant="body2" fontWeight="bold" color="text.secondary">
+                            Agendado para: {formatarData(doacao.data_agendamento)} às {doacao.hora_agendamento}
+                          </Typography>
+                          {getStatusChip(doacao.status_doacao)}
+                        </Box>
+                        
+                        <Box sx={{ pl: 1, borderLeft: '2px solid #e0e0e0' }}>
+                          {doacao.itens?.map((item) => (
+                            <Typography key={item.id} variant="body2" color="text.primary">
+                              • {itensMap[item.id_item] || "Item carregando..."} (Qtd: {item.quantidade})
+                            </Typography>
+                          ))}
+                        </Box>
+                        
+                        {doacao.observacao && (
+                          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, fontStyle: 'italic' }}>
+                            Nota: "{doacao.observacao}"
+                          </Typography>
+                        )}
+                      </ListItem>
+                      {index < doacoes.length - 1 && <Divider />}
+                    </Box>
+                  ))}
+                </List>
+              )}
+            </Paper>
+          </Grid>
+
+        </Grid>
       </Box>
     </Box>
   );

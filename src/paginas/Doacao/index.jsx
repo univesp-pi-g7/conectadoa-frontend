@@ -1,47 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Container,
-  AppBar,
-  Toolbar,
-  Avatar,
   Typography,
   Box,
-  Card,
-  CardContent,
+  Paper,
   IconButton,
   Button,
-  Link,
-  TextField,
-  List,
-  ListItem,
-  ListItemText,
-  Grid,
-  Paper,
+  Divider,
+  CircularProgress,
 } from "@mui/material";
-
 
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import LogoutIcon from "@mui/icons-material/Logout";
-import { useAuth } from "../../contextos/AuthContexto";
+import Navbar from "../../componentes/Navbar";
+import { listarItens } from "../../servicos/itemServico";
 
 const Doacao = () => {
   const navegar = useNavigate();
-  const { usuario, sair } = useAuth();
-  const handleSair = () => {
-    sair();
-    navegar("/login");
-  };
-  const inicialNome = usuario?.nome?.charAt(0)?.toUpperCase() || "U";
+  const [itens, setItens] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState("");
 
-  const [itens, setItens] = useState([
-    { nome: "Cesta Básica", quantidade: 0 },
-    { nome: "Carne", quantidade: 0 },
-    { nome: "Frango", quantidade: 0 },
-    { nome: "Detergente", quantidade: 0 },
-    { nome: "Sabonete", quantidade: 0 },
-  ]);
+  useEffect(() => {
+    const buscarDados = async () => {
+      try {
+        const dados = await listarItens();
+        setItens(dados.map(item => ({ ...item, quantidade: 0 })));
+      } catch (err) {
+        setErro("Não foi possível carregar os itens de doação.");
+      } finally {
+        setCarregando(false);
+      }
+    };
+    buscarDados();
+  }, []);
 
   const handleQuantidade = (index, delta) => {
     setItens((prevItens) =>
@@ -53,117 +46,223 @@ const Doacao = () => {
     );
   };
 
+  const totalItens = itens.reduce((acc, curr) => acc + curr.quantidade, 0);
+
+  const handleAgendar = () => {
+    const itensSelecionados = itens.filter(i => i.quantidade > 0);
+    if (itensSelecionados.length === 0) return;
+    
+    // Passa os itens selecionados para a tela de confirmação
+    navegar("/ConfirmarAgendamento", { state: { itensSelecionados } });
+  };
+
+  const itensUrgentes = itens.filter(item => item.prioridade_status === "alta");
+  const itensOutros = itens.filter(item => item.prioridade_status !== "alta");
+
   return (
-    <Box sx={{ minHeight: "100vh", backgroundColor: "background.default" }}>
-      <AppBar
-        position="static"
-        sx={{
-          background: "linear-gradient(135deg, #1a3c6e 0%, #2e6da4 100%)",
-        }}
-      >
-        <Toolbar sx={{ justifyContent: "space-between" }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Box
-              component="img"
-              src="/logo.png"
-              alt="ConectaDoa"
-              sx={{ height: 40, filter: "brightness(0) invert(1)" }}
-            />
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Avatar sx={{ bgcolor: "secondary.main", color: "primary.main" }}>
-              {inicialNome}
-            </Avatar>
-            <Typography variant="body1" sx={{ display: { xs: "none", sm: "block" } }}>
-              {usuario?.nome}
+    <Box sx={{ minHeight: "100vh", backgroundColor: "#f8f9fa", pb: { xs: 10, sm: 3 } }}>
+      {/* Barra superior (Navbar e BottomNav) */}
+      <Navbar />
+
+      <Container maxWidth="sm" sx={{ py: 3 }}>
+        
+        {/* Título da Página */}
+        <Typography 
+          variant="h5" 
+          align="center" 
+          fontWeight={600} 
+          color="#1a3c6e" 
+          gutterBottom
+        >
+          Selecionar Doação
+        </Typography>
+
+        {/* Card Principal */}
+        <Paper
+          elevation={3}
+          sx={{
+            borderRadius: 4,
+            p: { xs: 2, sm: 3 },
+            backgroundColor: "#ffffff",
+            mt: 2,
+            border: '1px solid #e0e0e0',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.05)'
+          }}
+        >
+          {/* Cabeçalho do Card */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+            <Typography variant="h6" fontWeight={700} color="#1a3c6e" sx={{ maxWidth: '75%', lineHeight: 1.2 }}>
+              Casa de Passagem Geisiane Valente <br/>
+              <Typography component="span" variant="body2" color="text.secondary">(Rio Claro-SP)</Typography>
             </Typography>
-            <Button
-              color="inherit"
-              startIcon={<LogoutIcon />}
-              onClick={handleSair}
-            >
-              Sair
-            </Button>
-          </Box>
-        </Toolbar>
-      </AppBar>
-      <Container sx={{ py: 3 }}>
-          <Box sx={{ display: "flex", justifyContent: "center", textAlign: "center", alignItems: "center", color:"#160f75", gap: 2 }}>
-          <Box> 
-            <Typography variant="h3" gutterBottom>
-              Conectando quem quer ajudar a quem mais precisa
-            </Typography>
-            <Box sx={{ mt: 2, py: 2, alignContent:"center", display:"flex", justifyContent:"center"}}>
-          </Box>
-        </Box>    
-                    
-          <Box
-            component="img"
-            src="/logo.png" 
-            alt="ConectaDoa"
-            sx={{
-              height: "180px",
-              border: "2px solid #cfe2f5", 
-              borderRadius: "8px",          
-              padding: "4px",               
-              backgroundColor: "#fff",      
-              boxShadow: "4px 4px 10px rgba(0,0,0,0.3)",
-            }}
-          />
-        </Box>
-     </Container>
-      <Container sx={{ py: 2 }}>
-          <Box sx={{ textAlign: "left", color:"#160f75" }}>
-            <Box sx={{ border: "2px solid #1976d2", borderRadius: "50px", backgroundColor: "#f5f5f5", boxShadow: "2px 2px 6px rgba(0,0,0,0.2)", alignItems: "center", justifyContent: "center", textAlign: "center" }}    >
-                <Typography variant="h5" gutterBottom align="center">
-                Casa de Passagem Geise Valente
-                </Typography>
-            </Box> 
-          </Box>  
-      </Container>      
-      <Box sx={{ p: 3, textAlign: "center", color: "#160f75" }}>
-        <Grid container spacing={2} justifyContent="center">
-          {itens.map((item, index) => (
-            <Grid item xs={12} sm={8} md={6} key={item.nome}>
-              <Paper
-                elevation={3}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  p: 2,
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Box 
+                component="span" 
+                sx={{ 
+                  bgcolor: '#d32f2f', 
+                  color: 'white', 
+                  px: 1, 
+                  py: 0.2, 
+                  borderRadius: 1, 
+                  fontSize: '0.7rem', 
+                  fontWeight: 'bold',
+                  mt: 0.5
                 }}
               >
-                <Typography variant="h6">{item.nome}</Typography>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <IconButton
-                    color="primary"
-                    onClick={() => handleQuantidade(index, -1)}
-                  >
-                    <RemoveIcon />
-                  </IconButton>
-                  <Typography variant="body1">{item.quantidade}</Typography>
-                  <IconButton
-                    color="primary"
-                    onClick={() => handleQuantidade(index, 1)}
-                  >
-                    <AddIcon />
-                  </IconButton>
-                </Box>
-              </Paper>
-            </Grid>
-          ))}
-        </Grid>
+                URGENTE
+              </Box>
+            </Box>
+          </Box>
 
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ mt: 4 }}
-          onClick={() => navegar("/ConfirmarAgendamento")}
-        >
-          Agendar Entrega
-        </Button>
-      </Box>
+          <Divider sx={{ my: 2 }} />
+
+          {carregando ? (
+            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+              <CircularProgress color="primary" />
+            </Box>
+          ) : erro ? (
+            <Typography variant="body1" color="error" align="center" sx={{ py: 3 }}>
+              {erro}
+            </Typography>
+          ) : (
+            <>
+              {/* Necessidades Urgentes */}
+              <Typography variant="subtitle2" fontWeight={700} color="#1a3c6e" sx={{ mb: 2 }}>
+                Necessidades Urgentes
+              </Typography>
+
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, mb: 3 }}>
+                {itensUrgentes.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary">Nenhum item urgente no momento.</Typography>
+                ) : (
+                  itens.map((item, index) => item.prioridade_status === 'alta' && (
+                    <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Box>
+                        <Typography variant="body1" fontWeight={600} color="#333">{item.nome_item}</Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: -0.5 }}>
+                          Categoria: {item.categoria}
+                        </Typography>
+                      </Box>
+                      
+                      {/* Botão de Quantidade (Pílula) */}
+                      <Box sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        bgcolor: '#1a3c6e', 
+                        borderRadius: 8,
+                        px: 0.5,
+                        py: 0.2,
+                        color: 'white',
+                        minWidth: 90,
+                        justifyContent: 'space-between'
+                      }}>
+                        <IconButton 
+                          size="small" 
+                          onClick={() => handleQuantidade(index, -1)}
+                          sx={{ color: 'white', p: 0.5 }}
+                        >
+                          <RemoveIcon fontSize="small" />
+                        </IconButton>
+                        <Typography variant="body1" fontWeight="bold" sx={{ minWidth: 24, textAlign: 'center' }}>
+                          {item.quantidade}
+                        </Typography>
+                        <IconButton 
+                          size="small" 
+                          onClick={() => handleQuantidade(index, 1)}
+                          sx={{ color: 'white', p: 0.5 }}
+                        >
+                          <AddIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                  ))
+                )}
+              </Box>
+
+              {/* Outras Necessidades */}
+              <Typography variant="subtitle2" fontWeight={700} color="#1a3c6e" sx={{ mb: 2 }}>
+                Outras Necessidades
+              </Typography>
+
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                {itensOutros.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary">Nenhuma outra necessidade.</Typography>
+                ) : (
+                  itens.map((item, index) => item.prioridade_status !== 'alta' && (
+                    <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Box>
+                        <Typography variant="body1" fontWeight={600} color="#333">{item.nome_item}</Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: -0.5 }}>
+                          Categoria: {item.categoria}
+                        </Typography>
+                      </Box>
+                      
+                      {/* Botão de Quantidade (Pílula) */}
+                      <Box sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        bgcolor: '#1a3c6e', 
+                        borderRadius: 8,
+                        px: 0.5,
+                        py: 0.2,
+                        color: 'white',
+                        minWidth: 90,
+                        justifyContent: 'space-between'
+                      }}>
+                        <IconButton 
+                          size="small" 
+                          onClick={() => handleQuantidade(index, -1)}
+                          sx={{ color: 'white', p: 0.5 }}
+                        >
+                          <RemoveIcon fontSize="small" />
+                        </IconButton>
+                        <Typography variant="body1" fontWeight="bold" sx={{ minWidth: 24, textAlign: 'center' }}>
+                          {item.quantidade}
+                        </Typography>
+                        <IconButton 
+                          size="small" 
+                          onClick={() => handleQuantidade(index, 1)}
+                          sx={{ color: 'white', p: 0.5 }}
+                        >
+                          <AddIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                  ))
+                )}
+              </Box>
+            </>
+          )}
+
+        </Paper>
+
+        {/* Resumo e Botão de Agendar */}
+        <Box sx={{ textAlign: "center", mt: 3, mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" fontWeight={500} gutterBottom>
+            *Você selecionou {totalItens} itens no total.
+          </Typography>
+
+          <Button
+            variant="contained"
+            fullWidth
+            disabled={totalItens === 0 || carregando}
+            sx={{ 
+              mt: 1, 
+              borderRadius: 8, 
+              py: 1.5, 
+              fontSize: '1.1rem', 
+              fontWeight: 'bold',
+              textTransform: 'none',
+              background: totalItens === 0 ? '#cccccc' : 'linear-gradient(90deg, #1a3c6e 0%, #2e6da4 100%)',
+              boxShadow: totalItens === 0 ? 'none' : '0 4px 15px rgba(26, 60, 110, 0.4)'
+            }}
+            onClick={handleAgendar}
+          >
+            Agendar Entrega
+          </Button>
+        </Box>
+        
+      </Container>
     </Box>
   );
 };

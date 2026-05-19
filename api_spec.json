@@ -1,0 +1,1283 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "ConectaDoa API",
+        "description": "API para gestão de doações do Centro de Acolhimento Social",
+        "version": "0.1.0"
+    },
+    "paths": {
+        "/auth/registro": {
+            "post": {
+                "tags": [
+                    "Autenticação"
+                ],
+                "summary": "Registrar novo usuário",
+                "description": "Cria uma nova conta de usuário (doador ou admin).",
+                "operationId": "registro_auth_registro_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UsuarioCreate"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UsuarioOut"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Autenticação"
+                ],
+                "summary": "Autenticar usuário",
+                "description": "Autentica o usuário com e-mail e senha, retornando um token JWT.",
+                "operationId": "login_auth_login_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginInput"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Token"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/me": {
+            "get": {
+                "tags": [
+                    "Autenticação"
+                ],
+                "summary": "Dados do usuário autenticado",
+                "description": "Retorna os dados do usuário autenticado via token JWT.",
+                "operationId": "me_auth_me_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UsuarioOut"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ]
+            }
+        },
+        "/itens": {
+            "get": {
+                "tags": [
+                    "Itens"
+                ],
+                "summary": "Listar itens disponíveis",
+                "description": "Retorna todos os itens cadastrados, ordenados por nome.",
+                "operationId": "listar_itens_itens_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/ItemOut"
+                                    },
+                                    "type": "array",
+                                    "title": "Response Listar Itens Itens Get"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Itens"
+                ],
+                "summary": "Criar item (admin)",
+                "description": "Cria um novo item no estoque. Requer perfil administrador.",
+                "operationId": "criar_item_itens_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ItemCreate"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ItemOut"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ]
+            }
+        },
+        "/itens/{item_id}": {
+            "put": {
+                "tags": [
+                    "Itens"
+                ],
+                "summary": "Atualizar item (admin)",
+                "description": "Atualiza campos de um item existente. Requer perfil administrador.",
+                "operationId": "atualizar_item_itens__item_id__put",
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "item_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Item Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ItemUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ItemOut"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Itens"
+                ],
+                "summary": "Remover item (admin)",
+                "description": "Remove um item do estoque. Requer perfil administrador.",
+                "operationId": "deletar_item_itens__item_id__delete",
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "item_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Item Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful Response"
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/necessidades": {
+            "get": {
+                "tags": [
+                    "Necessidades"
+                ],
+                "summary": "Listar necessidades abertas",
+                "description": "Retorna necessidades com status 'aberta', da mais recente à mais antiga.",
+                "operationId": "listar_necessidades_necessidades_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/NecessidadeOut"
+                                    },
+                                    "type": "array",
+                                    "title": "Response Listar Necessidades Necessidades Get"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Necessidades"
+                ],
+                "summary": "Criar necessidade (admin)",
+                "description": "Registra uma nova necessidade de item. Requer perfil administrador.",
+                "operationId": "criar_necessidade_necessidades_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NecessidadeCreate"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NecessidadeOut"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ]
+            }
+        },
+        "/necessidades/todas": {
+            "get": {
+                "tags": [
+                    "Necessidades"
+                ],
+                "summary": "Listar todas as necessidades (admin)",
+                "description": "Retorna todas as necessidades independente de status. Requer administrador.",
+                "operationId": "listar_todas_necessidades_necessidades_todas_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/NecessidadeOut"
+                                    },
+                                    "type": "array",
+                                    "title": "Response Listar Todas Necessidades Necessidades Todas Get"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ]
+            }
+        },
+        "/necessidades/{necessidade_id}": {
+            "put": {
+                "tags": [
+                    "Necessidades"
+                ],
+                "summary": "Atualizar status de necessidade (admin)",
+                "description": "Atualiza o status de uma necessidade. Requer perfil administrador.",
+                "operationId": "atualizar_necessidade_necessidades__necessidade_id__put",
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "necessidade_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Necessidade Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NecessidadeStatusUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NecessidadeOut"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Necessidades"
+                ],
+                "summary": "Remover necessidade (admin)",
+                "description": "Remove uma necessidade. Requer perfil administrador.",
+                "operationId": "deletar_necessidade_necessidades__necessidade_id__delete",
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "necessidade_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Necessidade Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful Response"
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/doacoes": {
+            "get": {
+                "tags": [
+                    "Doações"
+                ],
+                "summary": "Listar todas as doações (admin)",
+                "description": "Retorna todas as doações de todos os usuários. Requer administrador.",
+                "operationId": "listar_todas_doacoes_doacoes_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/DoacaoOut"
+                                    },
+                                    "type": "array",
+                                    "title": "Response Listar Todas Doacoes Doacoes Get"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Doações"
+                ],
+                "summary": "Registrar doação agendada",
+                "description": "Registra uma nova doação agendada para o usuário autenticado.",
+                "operationId": "criar_doacao_doacoes_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DoacaoBase"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DoacaoOut"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ]
+            }
+        },
+        "/doacoes/minhas": {
+            "get": {
+                "tags": [
+                    "Doações"
+                ],
+                "summary": "Listar minhas doações",
+                "description": "Retorna o histórico de doações do usuário autenticado.",
+                "operationId": "listar_minhas_doacoes_doacoes_minhas_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/DoacaoOut"
+                                    },
+                                    "type": "array",
+                                    "title": "Response Listar Minhas Doacoes Doacoes Minhas Get"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ]
+            }
+        },
+        "/doacoes/{doacao_id}/status": {
+            "put": {
+                "tags": [
+                    "Doações"
+                ],
+                "summary": "Atualizar status de doação (admin)",
+                "description": "Atualiza o status de uma doação (agendada/recebida/rejeitada). Requer administrador.",
+                "operationId": "atualizar_status_doacao_doacoes__doacao_id__status_put",
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "doacao_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Doacao Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DoacaoStatusUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DoacaoOut"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "DoacaoBase": {
+                "properties": {
+                    "itens": {
+                        "items": {
+                            "$ref": "#/components/schemas/DoacaoItemBase"
+                        },
+                        "type": "array",
+                        "minItems": 1,
+                        "title": "Itens"
+                    },
+                    "data_agendamento": {
+                        "type": "string",
+                        "format": "date",
+                        "title": "Data Agendamento"
+                    },
+                    "hora_agendamento": {
+                        "type": "string",
+                        "format": "time",
+                        "title": "Hora Agendamento"
+                    },
+                    "observacao": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Observacao"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "itens",
+                    "data_agendamento",
+                    "hora_agendamento"
+                ],
+                "title": "DoacaoBase",
+                "description": "Schema base para doações."
+            },
+            "DoacaoItemBase": {
+                "properties": {
+                    "id_item": {
+                        "type": "integer",
+                        "title": "Id Item"
+                    },
+                    "quantidade": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0.0,
+                        "title": "Quantidade"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id_item",
+                    "quantidade"
+                ],
+                "title": "DoacaoItemBase",
+                "description": "Schema para um item dentro de uma doação."
+            },
+            "DoacaoItemOut": {
+                "properties": {
+                    "id_item": {
+                        "type": "integer",
+                        "title": "Id Item"
+                    },
+                    "quantidade": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0.0,
+                        "title": "Quantidade"
+                    },
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id_item",
+                    "quantidade",
+                    "id"
+                ],
+                "title": "DoacaoItemOut",
+                "description": "Schema de saída para um item de doação."
+            },
+            "DoacaoOut": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "id_usuario": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Id Usuario"
+                    },
+                    "itens": {
+                        "items": {
+                            "$ref": "#/components/schemas/DoacaoItemOut"
+                        },
+                        "type": "array",
+                        "title": "Itens"
+                    },
+                    "data_agendamento": {
+                        "type": "string",
+                        "format": "date",
+                        "title": "Data Agendamento"
+                    },
+                    "hora_agendamento": {
+                        "type": "string",
+                        "format": "time",
+                        "title": "Hora Agendamento"
+                    },
+                    "status_doacao": {
+                        "$ref": "#/components/schemas/DoacaoStatus"
+                    },
+                    "observacao": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Observacao"
+                    },
+                    "criado_em": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Criado Em"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "id_usuario",
+                    "itens",
+                    "data_agendamento",
+                    "hora_agendamento",
+                    "status_doacao",
+                    "criado_em"
+                ],
+                "title": "DoacaoOut",
+                "description": "Schema de saída de doação."
+            },
+            "DoacaoStatus": {
+                "type": "string",
+                "enum": [
+                    "agendada",
+                    "recebida",
+                    "rejeitada"
+                ],
+                "title": "DoacaoStatus"
+            },
+            "DoacaoStatusUpdate": {
+                "properties": {
+                    "status_doacao": {
+                        "$ref": "#/components/schemas/DoacaoStatus"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "status_doacao"
+                ],
+                "title": "DoacaoStatusUpdate",
+                "description": "Schema para atualização de status de doação."
+            },
+            "HTTPValidationError": {
+                "properties": {
+                    "detail": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        },
+                        "type": "array",
+                        "title": "Detail"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "ItemCategoria": {
+                "type": "string",
+                "enum": [
+                    "Alimento",
+                    "Higiene",
+                    "Limpeza",
+                    "Vestuario"
+                ],
+                "title": "ItemCategoria"
+            },
+            "ItemCreate": {
+                "properties": {
+                    "nome_item": {
+                        "type": "string",
+                        "title": "Nome Item"
+                    },
+                    "categoria": {
+                        "$ref": "#/components/schemas/ItemCategoria"
+                    },
+                    "prioridade_status": {
+                        "$ref": "#/components/schemas/ItemPrioridade",
+                        "default": "media"
+                    },
+                    "quantidade_atual": {
+                        "type": "integer",
+                        "minimum": 0.0,
+                        "title": "Quantidade Atual",
+                        "default": 0
+                    },
+                    "quantidade_minima": {
+                        "type": "integer",
+                        "minimum": 0.0,
+                        "title": "Quantidade Minima",
+                        "default": 0
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "nome_item",
+                    "categoria"
+                ],
+                "title": "ItemCreate",
+                "description": "Schema para criação de item."
+            },
+            "ItemOut": {
+                "properties": {
+                    "nome_item": {
+                        "type": "string",
+                        "title": "Nome Item"
+                    },
+                    "categoria": {
+                        "$ref": "#/components/schemas/ItemCategoria"
+                    },
+                    "prioridade_status": {
+                        "$ref": "#/components/schemas/ItemPrioridade",
+                        "default": "media"
+                    },
+                    "quantidade_atual": {
+                        "type": "integer",
+                        "minimum": 0.0,
+                        "title": "Quantidade Atual",
+                        "default": 0
+                    },
+                    "quantidade_minima": {
+                        "type": "integer",
+                        "minimum": 0.0,
+                        "title": "Quantidade Minima",
+                        "default": 0
+                    },
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "atualizado_em": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Atualizado Em"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "nome_item",
+                    "categoria",
+                    "id",
+                    "atualizado_em"
+                ],
+                "title": "ItemOut",
+                "description": "Schema de saída de item."
+            },
+            "ItemPrioridade": {
+                "type": "string",
+                "enum": [
+                    "baixa",
+                    "media",
+                    "alta",
+                    "suficiente",
+                    "bloqueado"
+                ],
+                "title": "ItemPrioridade"
+            },
+            "ItemUpdate": {
+                "properties": {
+                    "nome_item": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Nome Item"
+                    },
+                    "categoria": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/ItemCategoria"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "prioridade_status": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/ItemPrioridade"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "quantidade_atual": {
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "minimum": 0.0
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Quantidade Atual"
+                    },
+                    "quantidade_minima": {
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "minimum": 0.0
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Quantidade Minima"
+                    }
+                },
+                "type": "object",
+                "title": "ItemUpdate",
+                "description": "Schema para atualização parcial de item."
+            },
+            "LoginInput": {
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "title": "Email"
+                    },
+                    "senha": {
+                        "type": "string",
+                        "title": "Senha"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "email",
+                    "senha"
+                ],
+                "title": "LoginInput",
+                "description": "Schema para autenticação (e-mail + senha)."
+            },
+            "NecessidadeCreate": {
+                "properties": {
+                    "id_item": {
+                        "type": "integer",
+                        "title": "Id Item"
+                    },
+                    "quantidade_solicitada": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0.0,
+                        "title": "Quantidade Solicitada"
+                    },
+                    "observacao": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Observacao"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id_item",
+                    "quantidade_solicitada"
+                ],
+                "title": "NecessidadeCreate",
+                "description": "Schema para criação de necessidade."
+            },
+            "NecessidadeOut": {
+                "properties": {
+                    "id_item": {
+                        "type": "integer",
+                        "title": "Id Item"
+                    },
+                    "quantidade_solicitada": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0.0,
+                        "title": "Quantidade Solicitada"
+                    },
+                    "observacao": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Observacao"
+                    },
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/NecessidadeStatus"
+                    },
+                    "criado_em": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Criado Em"
+                    },
+                    "atualizado_em": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Atualizado Em"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id_item",
+                    "quantidade_solicitada",
+                    "id",
+                    "status",
+                    "criado_em",
+                    "atualizado_em"
+                ],
+                "title": "NecessidadeOut",
+                "description": "Schema de saída de necessidade."
+            },
+            "NecessidadeStatus": {
+                "type": "string",
+                "enum": [
+                    "aberta",
+                    "atendida",
+                    "cancelada"
+                ],
+                "title": "NecessidadeStatus"
+            },
+            "NecessidadeStatusUpdate": {
+                "properties": {
+                    "status": {
+                        "$ref": "#/components/schemas/NecessidadeStatus"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "status"
+                ],
+                "title": "NecessidadeStatusUpdate",
+                "description": "Schema para atualização de status de necessidade."
+            },
+            "TipoUsuario": {
+                "type": "string",
+                "enum": [
+                    "doador",
+                    "admin"
+                ],
+                "title": "TipoUsuario"
+            },
+            "Token": {
+                "properties": {
+                    "access_token": {
+                        "type": "string",
+                        "title": "Access Token"
+                    },
+                    "token_type": {
+                        "type": "string",
+                        "title": "Token Type",
+                        "default": "bearer"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "access_token"
+                ],
+                "title": "Token",
+                "description": "Token JWT retornado após login bem-sucedido."
+            },
+            "UsuarioCreate": {
+                "properties": {
+                    "nome": {
+                        "type": "string",
+                        "title": "Nome"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "title": "Email"
+                    },
+                    "senha": {
+                        "type": "string",
+                        "title": "Senha"
+                    },
+                    "tipo_usuario": {
+                        "$ref": "#/components/schemas/TipoUsuario",
+                        "default": "doador"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "nome",
+                    "email",
+                    "senha"
+                ],
+                "title": "UsuarioCreate",
+                "description": "Schema para criação de um novo usuário."
+            },
+            "UsuarioOut": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "nome": {
+                        "type": "string",
+                        "title": "Nome"
+                    },
+                    "email": {
+                        "type": "string",
+                        "title": "Email"
+                    },
+                    "tipo_usuario": {
+                        "$ref": "#/components/schemas/TipoUsuario"
+                    },
+                    "criado_em": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Criado Em"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "nome",
+                    "email",
+                    "tipo_usuario",
+                    "criado_em"
+                ],
+                "title": "UsuarioOut",
+                "description": "Schema de saída de usuário — nunca expõe a senha."
+            },
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Error Type"
+                    },
+                    "input": {
+                        "title": "Input"
+                    },
+                    "ctx": {
+                        "type": "object",
+                        "title": "Context"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "title": "ValidationError"
+            }
+        },
+        "securitySchemes": {
+            "OAuth2PasswordBearer": {
+                "type": "oauth2",
+                "flows": {
+                    "password": {
+                        "scopes": {},
+                        "tokenUrl": "/auth/login"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -60,6 +60,7 @@ const Login = () => {
       navegar('/');
     } catch (err) {
       // Exibe a mensagem de erro amigável vinda do serviço
+      console.log(err);
       setErro(err.message || 'Erro ao fazer login. Tente novamente.');
     } finally {
       setCarregando(false);

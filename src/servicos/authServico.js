@@ -6,6 +6,7 @@
  *
  * Todas as funções são async e usam a instância do axios configurada em api.js.
  */
+import { AxiosError } from 'axios';
 import api from './api';
 
 // Chave usada para armazenar o token no localStorage
@@ -22,7 +23,7 @@ export const registrar = async (dados) => {
     return resposta.data;
   } catch (erro) {
     // Relança com mensagem legível vinda da API, ou mensagem genérica
-    const mensagem = erro.response?.data?.detail || 'Erro ao registrar. Tente novamente.';
+    const mensagem = erro.response?.data.detail[0].msg || 'Erro ao registrar. Tente novamente.';
     throw new Error(mensagem);
   }
 };
@@ -44,7 +45,9 @@ export const login = async (email, senha) => {
 
     return access_token;
   } catch (erro) {
-    const mensagem = erro.response?.data?.detail || 'E-mail ou senha inválidos.';
+    console.log("erro api login: ",erro.response);
+    console.log("erro api login: ",);
+    const mensagem = erro.response?.data.detail[0].msg || 'E-mail ou senha inválidos.';
     throw new Error(mensagem);
   }
 };
@@ -67,20 +70,11 @@ export const getUsuarioAtual = async () => {
     const resposta = await api.get('/auth/me');
     return resposta.data;
   } catch (erro) {
-    const mensagem = erro.response?.data?.detail || 'Erro ao buscar dados do usuário.';
+    const mensagem = erro.response?.data.detail[0].msg || 'Erro ao buscar dados do usuário.';
     throw new Error(mensagem);
   }
 };
 
-export const criarDoacao = async (dados) => {
-  try {
-    const resposta = await api.post('/doacoes', dados);
-    return resposta.data;
-  } catch (erro) {
-    const mensagem = erro.response?.data?.detail || 'Erro ao criar doação.';
-    throw new Error(mensagem);
-  }
-};
 
 /**
  * Verifica se existe um token salvo no localStorage.
