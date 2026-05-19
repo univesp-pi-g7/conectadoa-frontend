@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link as RouterLink, useLocation } from 'react-router-dom';
 import { 
   AppBar, 
@@ -17,6 +17,8 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import HomeIcon from '@mui/icons-material/Home';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import PersonIcon from '@mui/icons-material/Person';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import CategoryIcon from '@mui/icons-material/Category';
 import { useAuth } from '../contextos/AuthContexto';
 
 /**
@@ -38,73 +40,51 @@ const Navbar = ({ children, mostrarBotaoHome = false }) => {
 
   const inicialNome = usuario?.nome?.charAt(0)?.toUpperCase() || 'U';
 
-  // Determinar qual aba da bottom navigation está ativa
-  const getPathIndex = () => {
-    if (location.pathname === '/') return 0;
-    if (location.pathname.includes('/doacao') || location.pathname.includes('/casapassagen') || location.pathname.includes('/NecessidadeCasa')) return 1;
-    return 0; // Default
+  const getPathName = () => {
+    if (location.pathname === '/') return 'home';
+    if (location.pathname.includes('/casapassagen') || location.pathname.includes('/NecessidadeCasa') || location.pathname.includes('/doacao')) return 'mural';
+    if (location.pathname.includes('/admin-doacoes')) return 'doacoes';
+    if (location.pathname.includes('/admin-itens')) return 'itens';
+    return 'home'; // Default
   };
 
-  const [value, setValue] = useState(getPathIndex());
+  const [value, setValue] = useState(getPathName());
+
+  useEffect(() => {
+    setValue(getPathName());
+  }, [location.pathname]);
 
   const handleBottomNavChange = (event, newValue) => {
     setValue(newValue);
-    if (newValue === 0) navegar('/');
-    if (newValue === 1) navegar('/casapassagen');
-    if (newValue === 2) handleSair(); // Temporário: usa Perfil como botão de sair
+    if (newValue === 'home') navegar('/');
+    if (newValue === 'mural') navegar('/casapassagen');
+    if (newValue === 'doacoes' && usuario?.tipo_usuario === 'admin') navegar('/admin-doacoes');
+    if (newValue === 'itens' && usuario?.tipo_usuario === 'admin') navegar('/admin-itens');
+    if (newValue === 'sair') handleSair(); 
   };
 
-  // Se for mobile, exibe a barra superior simplificada + barra inferior
   if (isMobile) {
     return (
       <>
-        {/* Top bar minimalista (Apenas logo centralizada) */}
-        <AppBar
-          position="sticky"
-          sx={{
-            background: '#ffffff',
-            boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)',
-            borderBottom: '1px solid #f0f0f0'
-          }}
-        >
+        <AppBar position="sticky" sx={{ background: '#ffffff', boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)', borderBottom: '1px solid #f0f0f0' }}>
           <Toolbar sx={{ justifyContent: 'center', minHeight: '60px !important' }}>
-            <Box
-              component={RouterLink}
-              to="/"
-              sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
-            >
-              <Box
-                component="img"
-                src="/logo.png"
-                alt="ConectaDoa"
-                sx={{ height: 45 }}
-              />
+            <Box component={RouterLink} to="/" sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+              <Box component="img" src="/logo.png" alt="ConectaDoa" sx={{ height: 45 }} />
             </Box>
           </Toolbar>
         </AppBar>
 
-        {/* Bottom Navigation */}
-        <Paper 
-          sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1000 }} 
-          elevation={4}
-        >
-          <BottomNavigation
-            showLabels
-            value={value}
-            onChange={handleBottomNavChange}
-            sx={{
-              height: 65,
-              '& .MuiBottomNavigationAction-root': {
-                color: 'text.secondary',
-              },
-              '& .Mui-selected': {
-                color: 'primary.main',
-              }
-            }}
-          >
-            <BottomNavigationAction label="Início" icon={<HomeIcon />} />
-            <BottomNavigationAction label="Mural" icon={<AssignmentIcon />} />
-            <BottomNavigationAction label="Sair" icon={<PersonIcon />} />
+        <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1000 }} elevation={4}>
+          <BottomNavigation showLabels value={value} onChange={handleBottomNavChange} sx={{ height: 65, '& .MuiBottomNavigationAction-root': { color: 'text.secondary' }, '& .Mui-selected': { color: 'primary.main' } }}>
+            <BottomNavigationAction value="home" label="Início" icon={<HomeIcon />} />
+            <BottomNavigationAction value="mural" label="Mural" icon={<AssignmentIcon />} />
+            {usuario?.tipo_usuario === 'admin' && (
+              <BottomNavigationAction value="doacoes" label="Doações" icon={<AdminPanelSettingsIcon />} />
+            )}
+            {usuario?.tipo_usuario === 'admin' && (
+              <BottomNavigationAction value="itens" label="Itens" icon={<CategoryIcon />} />
+            )}
+            <BottomNavigationAction value="sair" label="Sair" icon={<PersonIcon />} />
           </BottomNavigation>
         </Paper>
       </>
@@ -163,6 +143,43 @@ const Navbar = ({ children, mostrarBotaoHome = false }) => {
             >
               Página Inicial
             </Button>
+          )}
+
+          {usuario?.tipo_usuario === 'admin' && (
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button
+                variant="text"
+                color="inherit"
+                size="medium"
+                startIcon={<AdminPanelSettingsIcon />}
+                onClick={() => navegar('/admin-doacoes')}
+                sx={{
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  color: '#ffffff',
+                  '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' },
+                }}
+              >
+                Doações (Admin)
+              </Button>
+              <Button
+                variant="text"
+                color="inherit"
+                size="medium"
+                startIcon={<CategoryIcon />}
+                onClick={() => navegar('/admin-itens')}
+                sx={{
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  color: '#ffffff',
+                  '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' },
+                }}
+              >
+                Itens (Admin)
+              </Button>
+            </Box>
           )}
 
           {children}

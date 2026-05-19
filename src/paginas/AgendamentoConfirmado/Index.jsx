@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { useLocation, useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useMemo } from 'react';
+import { useLocation, Link as RouterLink } from 'react-router-dom';
 import {
   Typography,
   Button,
@@ -9,13 +9,11 @@ import {
   Divider,
   List,
   ListItem,
-  ListItemText,
 } from "@mui/material";
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import FactCheckIcon from '@mui/icons-material/FactCheck';
 import MapIcon from '@mui/icons-material/Map';
-import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
 import StarIcon from '@mui/icons-material/Star';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
@@ -26,21 +24,23 @@ import { useAuth } from '../../contextos/AuthContexto';
 const AgendamentoConfirmado = () => {
   const { usuario } = useAuth();
   const location = useLocation();
-  const navegar = useNavigate();
 
   const state = location.state || {};
   const {
     totalItens = 0,
     categorias = "Diversos",
     dataStr = "Em breve",
-    horaStr = "A combinar"
+    horaStr = "A combinar",
+    doacaoId
   } = state;
 
-  // Gera um código de confirmação falso baseado na hora atual para dar realismo
+  // Gera o código de confirmação real com base no ID retornado pelo banco
   const codigoConfirmacao = useMemo(() => {
-    const num = Math.floor(Math.random() * 90000) + 10000;
-    return `CD-${num}`;
-  }, []);
+    if (!doacaoId) {
+      return 'CD-00000';
+    }
+    return `CD-${String(doacaoId).padStart(5, '0')}`;
+  }, [doacaoId]);
 
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: '#f8f9fa', pb: { xs: 10, sm: 3 } }}>
@@ -207,18 +207,6 @@ const AgendamentoConfirmado = () => {
             }}
           >
             Mural de Necessidades
-          </Button>
-
-          <Button
-            variant="text"
-            sx={{
-              textTransform: 'none',
-              color: '#2e6da4',
-              fontWeight: 600,
-              textDecoration: 'underline'
-            }}
-          >
-            Compartilhar e Inspirar
           </Button>
         </Box>
 

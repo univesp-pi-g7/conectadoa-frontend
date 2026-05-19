@@ -34,7 +34,6 @@ const NecessidadesCasa = () => {
   const [necessidadesAbertas, setNecessidadesAbertas] = useState([]);
   
   const [selectedItemId, setSelectedItemId] = useState("");
-  const [quantidade, setQuantidade] = useState("");
   const [observacao, setObservacao] = useState("");
   
   const [carregando, setCarregando] = useState(true);
@@ -52,6 +51,7 @@ const NecessidadesCasa = () => {
       setNecessidadesAbertas(necessidadesDados);
     } catch (err) {
       setErro("Erro ao carregar catálogo ou necessidades.");
+      console.error("Erro ao listar itens ou necessidades:", err);
     } finally {
       setCarregando(false);
     }
@@ -63,8 +63,8 @@ const NecessidadesCasa = () => {
 
   const handleAdicionar = async (e) => {
     e.preventDefault();
-    if (!selectedItemId || !quantidade) {
-      setErro("Por favor, preencha o item e a quantidade solicitada.");
+    if (!selectedItemId) {
+      setErro("Por favor, selecione o item.");
       return;
     }
 
@@ -74,7 +74,6 @@ const NecessidadesCasa = () => {
 
     const payload = {
       id_item: parseInt(selectedItemId),
-      quantidade_solicitada: parseInt(quantidade),
       observacao: observacao || null,
     };
 
@@ -84,7 +83,6 @@ const NecessidadesCasa = () => {
       
       // Limpa formulário
       setSelectedItemId("");
-      setQuantidade("");
       setObservacao("");
 
       // Recarrega lista
@@ -96,11 +94,7 @@ const NecessidadesCasa = () => {
     }
   };
 
-  // Mapeamento rápido para encontrar o nome do item na tabela de catálogo
-  const getItemNome = (idItem) => {
-    const item = itensCatalogo.find(i => i.id === idItem);
-    return item ? item.nome_item : `Item #${idItem}`;
-  };
+
 
   if (usuario?.tipo_usuario !== 'admin') {
     return (
@@ -166,16 +160,6 @@ const NecessidadesCasa = () => {
                     </Select>
                   </FormControl>
 
-                  <TextField
-                    label="Quantidade Solicitada"
-                    type="number"
-                    variant="outlined"
-                    fullWidth
-                    required
-                    inputProps={{ min: 1 }}
-                    value={quantidade}
-                    onChange={(e) => setQuantidade(e.target.value)}
-                  />
 
                   <TextField
                     label="Observação (Opcional)"
@@ -225,13 +209,10 @@ const NecessidadesCasa = () => {
                         sx={{ px: 0 }}
                       >
                         <ListItemText 
-                          primary={getItemNome(necessidade.id_item)} 
-                          secondary={necessidade.observacao ? `Obs: ${necessidade.observacao}` : null}
+                          primary={necessidade.item?.nome_item || `Item #${necessidade.id_item}`}
+                          secondary={necessidade.observacao ? `Obs: ${necessidade.observacao}` : necessidade.item?.categoria}
                           primaryTypographyProps={{ fontWeight: 600 }}
                         />
-                        <Typography variant="body1" fontWeight="bold" color="error">
-                          Qtd: {necessidade.quantidade_solicitada}
-                        </Typography>
                       </ListItem>
                     ))}
                   </List>

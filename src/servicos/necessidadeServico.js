@@ -19,3 +19,12 @@ export const criarNecessidade = async (dados) => {
     throw new Error(mensagem);
   }
 };
+export const deletarNecessidade = async (id) => {
+  try {
+    const resposta = await api.delete(`/necessidades/${id}`);
+    return resposta.data;
+  } catch (erro) {
+    const mensagem = erro.response?.data?.detail?.[0]?.msg || erro.response?.data?.detail || 'Erro ao remover necessidade.';
+    throw new Error(mensagem);
+  }
+};

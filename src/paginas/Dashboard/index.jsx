@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
 // Componentes MUI
@@ -12,7 +12,6 @@ import {
   Chip,
   List,
   ListItem,
-  ListItemText,
   Divider,
 } from '@mui/material';
 
@@ -29,34 +28,21 @@ import Navbar from '../../componentes/Navbar';
 // Contexto e Serviços
 import { useAuth } from '../../contextos/AuthContexto';
 import { listarMinhasDoacoes } from '../../servicos/doacaoServico';
-import { listarItens } from '../../servicos/itemServico';
 
 const Dashboard = () => {
   const { usuario } = useAuth();
   const [doacoes, setDoacoes] = useState([]);
-  const [itensMap, setItensMap] = useState({});
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
 
   useEffect(() => {
     const carregarDados = async () => {
       try {
-        // Busca doações e catálogo de itens em paralelo
-        const [doacoesDados, catalogoItens] = await Promise.all([
-          listarMinhasDoacoes(),
-          listarItens()
-        ]);
-
-        // Mapeia IDs de itens para nomes legíveis
-        const mapa = {};
-        catalogoItens.forEach(item => {
-          mapa[item.id] = item.nome_item;
-        });
-
-        setItensMap(mapa);
+        const doacoesDados = await listarMinhasDoacoes();
         setDoacoes(doacoesDados);
       } catch (err) {
         setErro("Não foi possível carregar seu histórico de doações.");
+        console.error("Erro ao listar doações:", err);
       } finally {
         setCarregando(false);
       }
@@ -118,10 +104,13 @@ const Dashboard = () => {
         <Grid container spacing={3} justifyContent="center" maxWidth="lg" sx={{ mx: 'auto' }}>
           
           {/* Card de boas-vindas */}
-          <Grid item xs={12} md={5}>
+          <Grid item xs={12} md={5} sx={{ display: 'flex', justifyContent: 'center' }}>
             <Paper
               elevation={3}
               sx={{
+                width: '100%',
+                maxWidth: { xs: 500, md: 'none' },
+                mx: { xs: 'auto', md: 0 },
                 padding: { xs: 3, sm: 4 },
                 textAlign: 'center',
                 borderRadius: 4,
@@ -182,10 +171,13 @@ const Dashboard = () => {
           </Grid>
 
           {/* Histórico de doações */}
-          <Grid item xs={12} md={7}>
+          <Grid item xs={12} md={7} sx={{ display: 'flex', justifyContent: 'center' }}>
             <Paper
               elevation={3}
               sx={{
+                width: '100%',
+                maxWidth: { xs: 500, md: 'none' },
+                mx: { xs: 'auto', md: 0 },
                 padding: { xs: 3, sm: 4 },
                 borderRadius: 4,
                 border: '1px solid #e0e0e0',
@@ -222,17 +214,19 @@ const Dashboard = () => {
                   {doacoes.map((doacao, index) => (
                     <Box key={doacao.id}>
                       <ListItem sx={{ px: 0, py: 2, display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 1, mb: 1.5 }}>
                           <Typography variant="body2" fontWeight="bold" color="text.secondary">
                             Agendado para: {formatarData(doacao.data_agendamento)} às {doacao.hora_agendamento}
                           </Typography>
-                          {getStatusChip(doacao.status_doacao)}
+                          <Box sx={{ flexShrink: 0 }}>
+                            {getStatusChip(doacao.status_doacao)}
+                          </Box>
                         </Box>
                         
                         <Box sx={{ pl: 1, borderLeft: '2px solid #e0e0e0' }}>
                           {doacao.itens?.map((item) => (
-                            <Typography key={item.id} variant="body2" color="text.primary">
-                              • {itensMap[item.id_item] || "Item carregando..."} (Qtd: {item.quantidade})
+                            <Typography key={item.id_item} variant="body2" color="text.primary">
+                              • {item.item?.nome_item || `Item #${item.id_item}`} (Qtd: {item.quantidade})
                             </Typography>
                           ))}
                         </Box>

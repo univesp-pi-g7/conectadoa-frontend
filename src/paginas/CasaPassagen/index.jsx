@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import {
   Typography,
@@ -14,12 +14,10 @@ import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import Navbar from '../../componentes/Navbar';
-import { useAuth } from '../../contextos/AuthContexto';
 import { listarNecessidadesAbertas } from '../../servicos/necessidadeServico';
 import { listarItens } from '../../servicos/itemServico';
 
 const CasaPassagen = () => {
-  const { usuario } = useAuth();
   const [necessidades, setNecessidades] = useState([]);
   const [itensMap, setItensMap] = useState({});
   const [carregando, setCarregando] = useState(true);
