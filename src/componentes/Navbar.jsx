@@ -68,7 +68,7 @@ const Navbar = ({ children, mostrarBotaoHome = false }) => {
       <>
         <AppBar position="sticky" sx={{ background: '#ffffff', boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)', borderBottom: '1px solid #f0f0f0' }}>
           <Toolbar sx={{ justifyContent: 'center', minHeight: '60px !important' }}>
-            <Box component={RouterLink} to="/" sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+            <Box component={RouterLink} to={usuario?.tipo_usuario === 'admin' ? '/admin-doacoes' : '/'} sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
               <Box component="img" src="/logo.png" alt="ConectaDoa" sx={{ height: 45 }} />
             </Box>
           </Toolbar>
@@ -76,7 +76,9 @@ const Navbar = ({ children, mostrarBotaoHome = false }) => {
 
         <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1000 }} elevation={4}>
           <BottomNavigation showLabels value={value} onChange={handleBottomNavChange} sx={{ height: 65, '& .MuiBottomNavigationAction-root': { color: 'text.secondary' }, '& .Mui-selected': { color: 'primary.main' } }}>
-            <BottomNavigationAction value="home" label="Início" icon={<HomeIcon />} />
+            {usuario?.tipo_usuario !== 'admin' && (
+              <BottomNavigationAction value="home" label="Início" icon={<HomeIcon />} />
+            )}
             <BottomNavigationAction value="mural" label="Mural" icon={<AssignmentIcon />} />
             {usuario?.tipo_usuario === 'admin' && (
               <BottomNavigationAction value="doacoes" label="Doações" icon={<AdminPanelSettingsIcon />} />
@@ -103,7 +105,7 @@ const Navbar = ({ children, mostrarBotaoHome = false }) => {
       <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, sm: 3 } }}>
         <Box
           component={RouterLink}
-          to="/"
+          to={usuario?.tipo_usuario === 'admin' ? '/admin-doacoes' : '/'}
           sx={{
             display: 'flex',
             alignItems: 'center',
