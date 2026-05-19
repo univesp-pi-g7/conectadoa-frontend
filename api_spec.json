@@ -194,6 +194,52 @@
             }
         },
         "/itens/{item_id}": {
+            "get": {
+                "tags": [
+                    "Itens"
+                ],
+                "summary": "Obter item por ID",
+                "description": "Retorna os detalhes de um item específico pelo seu ID.",
+                "operationId": "obter_item_itens__item_id__get",
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "item_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Item Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ItemOut"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "put": {
                 "tags": [
                     "Itens"
@@ -725,25 +771,28 @@
             },
             "DoacaoItemOut": {
                 "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
                     "id_item": {
                         "type": "integer",
                         "title": "Id Item"
                     },
                     "quantidade": {
                         "type": "integer",
-                        "exclusiveMinimum": 0.0,
                         "title": "Quantidade"
                     },
-                    "id": {
-                        "type": "integer",
-                        "title": "Id"
+                    "item": {
+                        "$ref": "#/components/schemas/ItemEmbutido"
                     }
                 },
                 "type": "object",
                 "required": [
+                    "id",
                     "id_item",
                     "quantidade",
-                    "id"
+                    "item"
                 ],
                 "title": "DoacaoItemOut",
                 "description": "Schema de saída para um item de doação."
@@ -764,6 +813,16 @@
                             }
                         ],
                         "title": "Id Usuario"
+                    },
+                    "usuario": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/DoadorOut"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
                     },
                     "itens": {
                         "items": {
@@ -837,6 +896,25 @@
                 "title": "DoacaoStatusUpdate",
                 "description": "Schema para atualização de status de doação."
             },
+            "DoadorOut": {
+                "properties": {
+                    "nome": {
+                        "type": "string",
+                        "title": "Nome"
+                    },
+                    "email": {
+                        "type": "string",
+                        "title": "Email"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "nome",
+                    "email"
+                ],
+                "title": "DoadorOut",
+                "description": "Schema simplificado de um doador."
+            },
             "HTTPValidationError": {
                 "properties": {
                     "detail": {
@@ -856,7 +934,8 @@
                     "Alimento",
                     "Higiene",
                     "Limpeza",
-                    "Vestuario"
+                    "Vestuario",
+                    "Outros"
                 ],
                 "title": "ItemCategoria"
             },
@@ -878,12 +957,6 @@
                         "minimum": 0.0,
                         "title": "Quantidade Atual",
                         "default": 0
-                    },
-                    "quantidade_minima": {
-                        "type": "integer",
-                        "minimum": 0.0,
-                        "title": "Quantidade Minima",
-                        "default": 0
                     }
                 },
                 "type": "object",
@@ -893,6 +966,33 @@
                 ],
                 "title": "ItemCreate",
                 "description": "Schema para criação de item."
+            },
+            "ItemEmbutido": {
+                "properties": {
+                    "nome_item": {
+                        "type": "string",
+                        "title": "Nome Item"
+                    },
+                    "categoria": {
+                        "$ref": "#/components/schemas/ItemCategoria"
+                    },
+                    "prioridade_status": {
+                        "$ref": "#/components/schemas/ItemPrioridade"
+                    },
+                    "quantidade_atual": {
+                        "type": "integer",
+                        "title": "Quantidade Atual"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "nome_item",
+                    "categoria",
+                    "prioridade_status",
+                    "quantidade_atual"
+                ],
+                "title": "ItemEmbutido",
+                "description": "Schema simplificado de item para uso embutido em outros recursos."
             },
             "ItemOut": {
                 "properties": {
@@ -911,12 +1011,6 @@
                         "type": "integer",
                         "minimum": 0.0,
                         "title": "Quantidade Atual",
-                        "default": 0
-                    },
-                    "quantidade_minima": {
-                        "type": "integer",
-                        "minimum": 0.0,
-                        "title": "Quantidade Minima",
                         "default": 0
                     },
                     "id": {
@@ -994,18 +1088,6 @@
                             }
                         ],
                         "title": "Quantidade Atual"
-                    },
-                    "quantidade_minima": {
-                        "anyOf": [
-                            {
-                                "type": "integer",
-                                "minimum": 0.0
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Quantidade Minima"
                     }
                 },
                 "type": "object",
@@ -1038,11 +1120,6 @@
                         "type": "integer",
                         "title": "Id Item"
                     },
-                    "quantidade_solicitada": {
-                        "type": "integer",
-                        "exclusiveMinimum": 0.0,
-                        "title": "Quantidade Solicitada"
-                    },
                     "observacao": {
                         "anyOf": [
                             {
@@ -1057,22 +1134,23 @@
                 },
                 "type": "object",
                 "required": [
-                    "id_item",
-                    "quantidade_solicitada"
+                    "id_item"
                 ],
                 "title": "NecessidadeCreate",
                 "description": "Schema para criação de necessidade."
             },
             "NecessidadeOut": {
                 "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
                     "id_item": {
                         "type": "integer",
                         "title": "Id Item"
                     },
-                    "quantidade_solicitada": {
-                        "type": "integer",
-                        "exclusiveMinimum": 0.0,
-                        "title": "Quantidade Solicitada"
+                    "item": {
+                        "$ref": "#/components/schemas/ItemEmbutido"
                     },
                     "observacao": {
                         "anyOf": [
@@ -1084,10 +1162,6 @@
                             }
                         ],
                         "title": "Observacao"
-                    },
-                    "id": {
-                        "type": "integer",
-                        "title": "Id"
                     },
                     "status": {
                         "$ref": "#/components/schemas/NecessidadeStatus"
@@ -1105,9 +1179,9 @@
                 },
                 "type": "object",
                 "required": [
-                    "id_item",
-                    "quantidade_solicitada",
                     "id",
+                    "id_item",
+                    "item",
                     "status",
                     "criado_em",
                     "atualizado_em"

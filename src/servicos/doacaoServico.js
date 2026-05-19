@@ -19,3 +19,25 @@ export const listarMinhasDoacoes = async () => {
     throw new Error(mensagem);
   }
 };
+
+export const listarTodasDoacoes = async () => {
+  try {
+    const resposta = await api.get('/doacoes');
+    return resposta.data;
+  } catch (erro) {
+    const mensagem = erro.response?.data?.detail?.[0]?.msg || erro.response?.data?.detail || 'Erro ao buscar doações.';
+    throw new Error(mensagem);
+  }
+};
+
+export const atualizarStatusDoacao = async (doacaoId, novoStatus) => {
+  try {
+    const resposta = await api.put(`/doacoes/${doacaoId}/status`, {
+      status_doacao: novoStatus
+    });
+    return resposta.data;
+  } catch (erro) {
+    const mensagem = erro.response?.data?.detail?.[0]?.msg || erro.response?.data?.detail || 'Erro ao atualizar status da doação.';
+    throw new Error(mensagem);
+  }
+};
