@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Typography,
@@ -10,7 +10,6 @@ import {
   Divider,
   Alert,
   CircularProgress,
-  Grid,
 } from "@mui/material";
 
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
@@ -25,7 +24,7 @@ const gerarDatas = () => {
   const diasSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
   const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
   
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 6; i++) {
     const data = new Date(hoje);
     data.setDate(hoje.getDate() + i);
     
@@ -57,7 +56,7 @@ const ConfirmarAgendamento = () => {
   
   const itensSelecionados = location.state?.itensSelecionados || [];
 
-  const [data, setData] = useState("");
+  const [data, setData] = useState(gerarDatas()[0].value);
   const [hora, setHora] = useState("");
   const [observacao, setObservacao] = useState("");
   const [carregando, setCarregando] = useState(false);
@@ -93,14 +92,15 @@ const ConfirmarAgendamento = () => {
     };
 
     try {
-      await criarDoacao(payload);
+      const doacaoCriada = await criarDoacao(payload);
       // Passar dados da doação para a página de sucesso para poder renderizar os mesmos dados do protótipo
       navegar('/AgendamentoConfirmado', { 
         state: { 
           totalItens: totalQuantidade, 
           categorias, 
           dataStr: gerarDatas().find(d => d.value === data)?.labelBottom || data,
-          horaStr: hora
+          horaStr: hora,
+          doacaoId: doacaoCriada?.id
         } 
       });
     } catch (err) {
@@ -214,18 +214,22 @@ const ConfirmarAgendamento = () => {
             </Typography>
 
             {/* Datas Pill Buttons */}
-            <Box sx={{ display: 'flex', gap: 1, overflowX: 'auto', pb: 1, mb: 1, '&::-webkit-scrollbar': { display: 'none' } }}>
+            <Box sx={{ display: 'flex', flexWrap: 'nowrap', gap: 1.5, overflowX: 'auto', pb: 1, mb: 2, '&::-webkit-scrollbar': { display: 'none' } }}>
               {datasDisponiveis.map((item) => {
                 const isSelected = data === item.value;
                 return (
                   <Button
                     key={item.value}
-                    onClick={() => setData(item.value)}
+                    onClick={() => {
+                      setData(item.value);
+                      setHora(""); // Reseta a hora ao trocar o dia
+                    }}
                     sx={{
-                      minWidth: 80,
+                      minWidth: 100,
+                      flexShrink: 0,
                       flexDirection: 'column',
-                      borderRadius: 2,
-                      py: 1,
+                      borderRadius: 3,
+                      py: 1.2,
                       px: 2,
                       border: isSelected ? '2px solid #1a3c6e' : '1px solid #e0e0e0',
                       bgcolor: isSelected ? '#1a3c6e' : 'transparent',
@@ -235,10 +239,10 @@ const ConfirmarAgendamento = () => {
                       }
                     }}
                   >
-                    <Typography variant="caption" fontWeight="bold" sx={{ display: 'block', lineHeight: 1.1 }}>
+                    <Typography variant="caption" fontWeight="bold" sx={{ display: 'block', lineHeight: 1.1, mb: 0.3 }}>
                       {item.labelTop}
                     </Typography>
-                    <Typography variant="caption" sx={{ display: 'block' }}>
+                    <Typography variant="caption" sx={{ display: 'block', opacity: 0.8 }}>
                       {item.labelBottom}
                     </Typography>
                   </Button>
@@ -247,33 +251,55 @@ const ConfirmarAgendamento = () => {
             </Box>
 
             {/* Horas Pill Buttons */}
-            <Grid container spacing={1}>
-              {horarios.map((item) => {
-                const isSelected = hora === item;
+            {(() => {
+              const hojeStr = new Date().toISOString().split('T')[0];
+              const horariosDisponiveis = data === hojeStr
+                ? horarios.filter(slot => {
+                    const startHour = parseInt(slot.split(':')[0], 10);
+                    return startHour >= new Date().getHours();
+                  })
+                : horarios;
+
+              if (data && horariosDisponiveis.length === 0) {
                 return (
-                  <Grid item xs={6} sm={4} key={item}>
-                    <Button
-                      fullWidth
-                      onClick={() => setHora(item)}
-                      sx={{
-                        borderRadius: 2,
-                        py: 0.8,
-                        border: isSelected ? '2px solid #1a3c6e' : '1px solid #e0e0e0',
-                        bgcolor: isSelected ? '#1a3c6e' : 'transparent',
-                        color: isSelected ? 'white' : 'text.primary',
-                        fontSize: '0.8rem',
-                        fontWeight: isSelected ? 'bold' : 'normal',
-                        '&:hover': {
-                          bgcolor: isSelected ? '#1a3c6e' : '#f5f5f5',
-                        }
-                      }}
-                    >
-                      {item}
-                    </Button>
-                  </Grid>
+                  <Typography variant="body2" color="error" align="center" sx={{ py: 2, fontWeight: 500 }}>
+                    Nenhum horário de entrega disponível para hoje. Por favor, selecione outro dia.
+                  </Typography>
                 );
-              })}
-            </Grid>
+              }
+
+              return (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: 'center', mt: 1 }}>
+                  {horariosDisponiveis.map((item) => {
+                    const isSelected = hora === item;
+                    return (
+                      <Button
+                        key={item}
+                        onClick={() => setHora(item)}
+                        sx={{
+                          borderRadius: 2.5,
+                          py: 1,
+                          px: 2.5,
+                          minWidth: { xs: 'calc(50% - 12px)', sm: '140px' },
+                          border: isSelected ? '2px solid #1a3c6e' : '1px solid #e0e0e0',
+                          bgcolor: isSelected ? '#1a3c6e' : 'transparent',
+                          color: isSelected ? 'white' : 'text.primary',
+                          fontSize: '0.85rem',
+                          fontWeight: isSelected ? 'bold' : 'normal',
+                          textTransform: 'none',
+                          boxShadow: isSelected ? '0 4px 10px rgba(26, 60, 110, 0.2)' : 'none',
+                          '&:hover': {
+                            bgcolor: isSelected ? '#1a3c6e' : '#f5f5f5',
+                          }
+                        }}
+                      >
+                        {item}
+                      </Button>
+                    );
+                  })}
+                </Box>
+              );
+            })()}
           </Box>
 
           <Divider />
