@@ -1,142 +1,249 @@
-import { useState } from "react";
-import { useNavigate, Link as RouterLink, Navigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import {
   Container,
-  AppBar,
-  Toolbar,
-  Avatar,
   Typography,
   Box,
   Card,
   CardContent,
   Button,
-  Link,
   TextField,
   List,
   ListItem,
   ListItemText,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Alert,
+  CircularProgress,
+  Divider,
 } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
-import LogoutIcon from '@mui/icons-material/Logout';
-import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
+import Navbar from '../../componentes/Navbar';
 import { useAuth } from '../../contextos/AuthContexto';
+import { listarItens } from "../../servicos/itemServico";
+import { listarNecessidadesAbertas, criarNecessidade } from "../../servicos/necessidadeServico";
 
 const NecessidadesCasa = () => {
+  const { usuario } = useAuth();
   const navegar = useNavigate();
-  const { usuario, sair } = useAuth();
-  const handleSair = () => {sair(); navegar('/login');};
-  const inicialNome = usuario?.nome?.charAt(0)?.toUpperCase() || 'U';
-  const [item, setItem] = useState("");
-  const [lista, setLista] = useState([]);
-  const handleAdicionar = () => {if (item.trim() !== "") {setLista([...lista, item]); setItem("");}};
 
+  const [itensCatalogo, setItensCatalogo] = useState([]);
+  const [necessidadesAbertas, setNecessidadesAbertas] = useState([]);
+  
+  const [selectedItemId, setSelectedItemId] = useState("");
+  const [quantidade, setQuantidade] = useState("");
+  const [observacao, setObservacao] = useState("");
+  
+  const [carregando, setCarregando] = useState(true);
+  const [enviando, setEnviando] = useState(false);
+  const [erro, setErro] = useState("");
+  const [sucesso, setSucesso] = useState("");
 
+  const carregarDados = async () => {
+    try {
+      const [itensDados, necessidadesDados] = await Promise.all([
+        listarItens(),
+        listarNecessidadesAbertas()
+      ]);
+      setItensCatalogo(itensDados);
+      setNecessidadesAbertas(necessidadesDados);
+    } catch (err) {
+      setErro("Erro ao carregar catálogo ou necessidades.");
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  useEffect(() => {
+    carregarDados();
+  }, []);
+
+  const handleAdicionar = async (e) => {
+    e.preventDefault();
+    if (!selectedItemId || !quantidade) {
+      setErro("Por favor, preencha o item e a quantidade solicitada.");
+      return;
+    }
+
+    setEnviando(true);
+    setErro("");
+    setSucesso("");
+
+    const payload = {
+      id_item: parseInt(selectedItemId),
+      quantidade_solicitada: parseInt(quantidade),
+      observacao: observacao || null,
+    };
+
+    try {
+      await criarNecessidade(payload);
+      setSucesso("Necessidade cadastrada com sucesso!");
+      
+      // Limpa formulário
+      setSelectedItemId("");
+      setQuantidade("");
+      setObservacao("");
+
+      // Recarrega lista
+      carregarDados();
+    } catch (err) {
+      setErro(err.message || "Erro ao salvar a necessidade.");
+    } finally {
+      setEnviando(false);
+    }
+  };
+
+  // Mapeamento rápido para encontrar o nome do item na tabela de catálogo
+  const getItemNome = (idItem) => {
+    const item = itensCatalogo.find(i => i.id === idItem);
+    return item ? item.nome_item : `Item #${idItem}`;
+  };
+
+  if (usuario?.tipo_usuario !== 'admin') {
+    return (
+      <Box sx={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
+        <Navbar />
+        <Container maxWidth="sm" sx={{ py: 6, textAlign: 'center' }}>
+          <Alert severity="error" sx={{ mb: 3 }}>
+            Acesso Restrito: Apenas administradores podem gerenciar necessidades da instituição.
+          </Alert>
+          <Button variant="contained" onClick={() => navegar('/')} sx={{ bgcolor: '#1a3c6e' }}>
+            Voltar para Início
+          </Button>
+        </Container>
+      </Box>
+    );
+  }
 
   return (
-    <>
-        <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
-            <AppBar
-            position="static"
-            sx={{ background: 'linear-gradient(135deg, #1a3c6e 0%, #2e6da4 100%)',
-            }}>
-            <Toolbar sx={{ justifyContent: 'space-between' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Box
-                    component="img"
-                    src="/logo.png"
-                    alt="ConectaDoa"
-                    sx={{ height: 40, filter: 'brightness(0) invert(1)' }}
-                />
-                </Box>
+    <Box sx={{ minHeight: '100vh', backgroundColor: '#f8f9fa', pb: { xs: 10, sm: 3 } }}>
+      <Navbar />
 
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Avatar sx={{ bgcolor: 'secondary.main', color: 'primary.main', fontWeight: 700 }}>
-                    {inicialNome}
-                </Avatar>
-                <Typography variant="body1" sx={{ display: { xs: 'none', sm: 'block' } }}>
-                    {usuario?.nome}
-                </Typography>
-                <Button
-                    id="botao-sair"
-                    color="inherit"
-                    startIcon={<LogoutIcon />}
-                    onClick={handleSair}
-                    sx={{ ml: 1 }}
-                >
-                    Sair
-                </Button>
-                </Box>
-            </Toolbar>
-            </AppBar>
+      <Container maxWidth="md" sx={{ py: 4 }}>
+        <Typography variant="h4" fontWeight="bold" gutterBottom align="center" color="#1a3c6e">
+          Gestão de Necessidades da Instituição
+        </Typography>
 
-            {/* Conteúdo principal */}
-            <Container sx={{ py: 3 }}>
-                <Box id="início" sx={{ display: "flex", justifyContent: "center", textAlign: "center", alignItems: "center", color:"#160f75", gap: 2 }}>
-                    <Box> 
-                        <Typography variant="h3" gutterBottom>
-                        Conectando quem quer ajudar a quem mais precisa
-                        </Typography>
-                        <Box sx={{ mt: 2, py: 2, alignContent:"center", display:"flex", justifyContent:"center"}}>
-                    </Box>             
-                        
-                    <Box
-                        component="img"
-                        src="/logo.png" 
-                        alt="ConectaDoa"
-                        sx={{
-                        height: "180px",
-                        border: "2px solid #cfe2f5", 
-                        borderRadius: "8px",          
-                        padding: "4px",               
-                        backgroundColor: "#fff",      
-                        boxShadow: "4px 4px 10px rgba(0,0,0,0.3)",
-                        }}
-                    />
-                    </Box>
-                </Box> 
-            </Container>
-        </Box>
-        <Container sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom align="center" color="primary">
-        Cadastro de Necessidades da Instituição
-      </Typography>
-
-      <Card sx={{ maxWidth: 600, mx: "auto", p: 2 }}>
-        <CardContent>
-          <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-            <TextField
-              label="Nome do item"
-              variant="outlined"
-              fullWidth
-              value={item}
-              onChange={(e) => setItem(e.target.value)}
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleAdicionar}
-            >
-              Adicionar
-            </Button>
+        {carregando ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+            <CircularProgress />
           </Box>
-
-          <List>
-            {lista.map((necessidade, index) => (
-              <ListItem key={index} divider>
-                <ListItemText primary={necessidade} />
-              </ListItem>
-            ))}
-          </List>
-        </CardContent>
-      </Card>
-    </Container>
+        ) : (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             
-    </>
+            {/* Bloco de Mensagens */}
+            {(erro || sucesso) && (
+              <Box sx={{ maxWidth: 600, mx: "auto", width: '100%' }}>
+                {erro && <Alert severity="error">{erro}</Alert>}
+                {sucesso && <Alert severity="success">{sucesso}</Alert>}
+              </Box>
+            )}
+
+            {/* Card de Cadastro */}
+            <Card sx={{ maxWidth: 600, mx: "auto", p: 2, width: '100%', borderRadius: 3, border: '1px solid #e0e0e0', boxShadow: '0 8px 24px rgba(0,0,0,0.03)' }}>
+              <CardContent component="form" onSubmit={handleAdicionar}>
+                <Typography variant="h6" fontWeight="bold" color="#1a3c6e" gutterBottom>
+                  Cadastrar Nova Necessidade
+                </Typography>
+
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mt: 2 }}>
+                  <FormControl fullWidth required>
+                    <InputLabel id="select-item-label">Selecione o Item</InputLabel>
+                    <Select
+                      labelId="select-item-label"
+                      value={selectedItemId}
+                      label="Selecione o Item"
+                      onChange={(e) => setSelectedItemId(e.target.value)}
+                    >
+                      {itensCatalogo.map(item => (
+                        <MenuItem key={item.id} value={item.id}>
+                          {item.nome_item} ({item.categoria})
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                  <TextField
+                    label="Quantidade Solicitada"
+                    type="number"
+                    variant="outlined"
+                    fullWidth
+                    required
+                    inputProps={{ min: 1 }}
+                    value={quantidade}
+                    onChange={(e) => setQuantidade(e.target.value)}
+                  />
+
+                  <TextField
+                    label="Observação (Opcional)"
+                    variant="outlined"
+                    fullWidth
+                    value={observacao}
+                    onChange={(e) => setObservacao(e.target.value)}
+                  />
+
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={enviando}
+                    startIcon={enviando ? <CircularProgress size={20} /> : <AddIcon />}
+                    sx={{
+                      py: 1.5,
+                      borderRadius: 3,
+                      background: 'linear-gradient(135deg, #1a3c6e 0%, #2e6da4 100%)',
+                      boxShadow: '0 4px 15px rgba(26, 60, 110, 0.4)',
+                    }}
+                  >
+                    {enviando ? "Adicionando..." : "Adicionar Necessidade"}
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+
+            {/* Card com Necessidades Ativas */}
+            <Card sx={{ maxWidth: 600, mx: "auto", p: 2, width: '100%', borderRadius: 3, border: '1px solid #e0e0e0', boxShadow: '0 8px 24px rgba(0,0,0,0.03)' }}>
+              <CardContent>
+                <Typography variant="h6" fontWeight="bold" color="#1a3c6e" gutterBottom>
+                  Necessidades Abertas Atuais
+                </Typography>
+                
+                <Divider sx={{ my: 1.5 }} />
+
+                {necessidadesAbertas.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 3 }}>
+                    Nenhuma necessidade aberta cadastrada no momento.
+                  </Typography>
+                ) : (
+                  <List>
+                    {necessidadesAbertas.map((necessidade, index) => (
+                      <ListItem 
+                        key={necessidade.id} 
+                        divider={index < necessidadesAbertas.length - 1}
+                        sx={{ px: 0 }}
+                      >
+                        <ListItemText 
+                          primary={getItemNome(necessidade.id_item)} 
+                          secondary={necessidade.observacao ? `Obs: ${necessidade.observacao}` : null}
+                          primaryTypographyProps={{ fontWeight: 600 }}
+                        />
+                        <Typography variant="body1" fontWeight="bold" color="error">
+                          Qtd: {necessidade.quantidade_solicitada}
+                        </Typography>
+                      </ListItem>
+                    ))}
+                  </List>
+                )}
+              </CardContent>
+            </Card>
+
+          </Box>
+        )}
+      </Container>
+    </Box>
   );
 }
-  
-
 
 export default NecessidadesCasa;
