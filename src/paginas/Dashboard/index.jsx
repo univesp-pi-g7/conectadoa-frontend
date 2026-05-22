@@ -106,15 +106,15 @@ const Dashboard = () => {
       <Navbar />
 
       <Box sx={{ p: { xs: 2, sm: 4 } }}>
-        <Grid container spacing={3} justifyContent="center" maxWidth="lg" sx={{ mx: 'auto' }}>
+        <Grid container direction="column" spacing={4} alignItems="center" sx={{ mx: 'auto', maxWidth: 900 }}>
           
           {/* Card de boas-vindas */}
-          <Grid item xs={12} md={5} sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
             <Paper
               elevation={3}
               sx={{
                 width: '100%',
-                maxWidth: { xs: 500, md: 'none' },
+                maxWidth: 700,
                 mx: { xs: 'auto', md: 0 },
                 padding: { xs: 3, sm: 4 },
                 textAlign: 'center',
@@ -176,12 +176,12 @@ const Dashboard = () => {
           </Grid>
 
           {/* Histórico de doações */}
-          <Grid item xs={12} md={7} sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
             <Paper
               elevation={3}
               sx={{
                 width: '100%',
-                maxWidth: { xs: 500, md: 'none' },
+                maxWidth: 700,
                 mx: { xs: 'auto', md: 0 },
                 padding: { xs: 3, sm: 4 },
                 borderRadius: 4,
