@@ -19,7 +19,7 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import PersonIcon from '@mui/icons-material/Person';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import CategoryIcon from '@mui/icons-material/Category';
-import { useAuth } from '../contextos/AuthContexto';
+import { useAuth } from '@/contextos/AuthContexto';
 
 /**
  * @param {Object} props

@@ -24,8 +24,8 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 
-import Navbar from '../../componentes/Navbar';
-import { listarTodasDoacoes, atualizarStatusDoacao } from '../../servicos/doacaoServico';
+import Navbar from '@/componentes/Navbar';
+import { listarTodasDoacoes, atualizarStatusDoacao } from '@/servicos/doacaoServico';
 
 const STATUS_CORES = {
   agendada: { cor: 'warning', label: 'Agendado' },

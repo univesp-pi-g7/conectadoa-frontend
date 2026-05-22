@@ -21,10 +21,10 @@ import {
 } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
-import Navbar from '../../componentes/Navbar';
-import { useAuth } from '../../contextos/AuthContexto';
-import { listarItens } from "../../servicos/itemServico";
-import { listarNecessidadesAbertas, criarNecessidade } from "../../servicos/necessidadeServico";
+import Navbar from '@/componentes/Navbar';
+import { useAuth } from '@/contextos/AuthContexto';
+import { listarItens } from "@/servicos/itemServico";
+import { listarNecessidadesAbertas, criarNecessidade } from "@/servicos/necessidadeServico";
 
 const NecessidadesCasa = () => {
   const { usuario } = useAuth();

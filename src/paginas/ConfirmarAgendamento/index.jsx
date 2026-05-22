@@ -15,8 +15,8 @@ import {
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import DeviceThermostatIcon from '@mui/icons-material/DeviceThermostat';
 import MapIcon from '@mui/icons-material/Map';
-import Navbar from '../../componentes/Navbar';
-import { criarDoacao } from '../../servicos/doacaoServico';
+import Navbar from '@/componentes/Navbar';
+import { criarDoacao } from '@/servicos/doacaoServico';
 
 const gerarDatas = () => {
   const datas = [];

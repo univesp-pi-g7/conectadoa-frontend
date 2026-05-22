@@ -13,9 +13,9 @@ import DeviceThermostatIcon from '@mui/icons-material/DeviceThermostat';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import InstagramIcon from '@mui/icons-material/Instagram';
-import Navbar from '../../componentes/Navbar';
-import { listarNecessidadesAbertas } from '../../servicos/necessidadeServico';
-import { listarItens } from '../../servicos/itemServico';
+import Navbar from '@/componentes/Navbar';
+import { listarNecessidadesAbertas } from '@/servicos/necessidadeServico';
+import { listarItens } from '@/servicos/itemServico';
 
 const CasaPassagen = () => {
   const [necessidades, setNecessidades] = useState([]);

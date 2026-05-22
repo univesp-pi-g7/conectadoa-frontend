@@ -23,11 +23,11 @@ import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import CancelIcon from '@mui/icons-material/Cancel';
 
 // Componentes do Sistema
-import Navbar from '../../componentes/Navbar';
+import Navbar from '@/componentes/Navbar';
 
 // Contexto e Serviços
-import { useAuth } from '../../contextos/AuthContexto';
-import { listarMinhasDoacoes } from '../../servicos/doacaoServico';
+import { useAuth } from '@/contextos/AuthContexto';
+import { listarMinhasDoacoes } from '@/servicos/doacaoServico';
 
 const Dashboard = () => {
   const { usuario } = useAuth();

@@ -10,7 +10,7 @@
  * - useAuth: hook para consumir o contexto de forma simples
  */
 import { createContext, useContext, useState, useEffect } from 'react';
-import * as authServico from '../servicos/authServico';
+import * as authServico from '@/servicos/authServico';
 
 // Cria o contexto — será preenchido pelo AuthProvider
 const AuthContexto = createContext(null);

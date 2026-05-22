@@ -1,4 +1,4 @@
-import api from './api';
+import api from '@/servicos/api';
 
 export const criarDoacao = async (dados) => {
   try {

@@ -23,19 +23,19 @@ import {
 
 import AddIcon from '@mui/icons-material/Add';
 
-import Navbar from '../../componentes/Navbar';
-import { useAuth } from '../../contextos/AuthContexto';
-import ItemCard from '../../componentes/ItemCard';
+import Navbar from '@/componentes/Navbar';
+import { useAuth } from '@/contextos/AuthContexto';
+import ItemCard from '@/componentes/ItemCard';
 import {
 	listarItens,
 	criarItem,
 	atualizarItem,
-} from '../../servicos/itemServico';
+} from '@/servicos/itemServico';
 import {
 	listarNecessidadesAbertas,
 	criarNecessidade,
 	deletarNecessidade,
-} from '../../servicos/necessidadeServico';
+} from '@/servicos/necessidadeServico';
 
 const CATEGORIAS = ['Alimento', 'Higiene', 'Limpeza', 'Vestuario', 'Outros'];
 const PRIORIDADES = [

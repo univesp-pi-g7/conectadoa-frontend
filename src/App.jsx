@@ -17,24 +17,24 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
 // Tema customizado
-import tema from './tema/tema';
+import tema from '@/tema/tema';
 
 // Componente de proteção de rotas
-import RotaProtegida from './componentes/RotaProtegida';
+import RotaProtegida from '@/componentes/RotaProtegida';
 
 // Páginas
-import Login from './paginas/Login';
-import Registro from './paginas/Registro';
-import Dashboard from './paginas/Dashboard';
-import Doacao from './paginas/Doacao';
-import Home from './paginas/Home';
-import CasaPassagen from './paginas/CasaPassagen';
-import NecessidadeCasa from './paginas/NecessidadeCasa';
-import ConfirmarAgendamento from './paginas/ConfirmarAgendamento';
-import AgendamentoConfirmado from './paginas/AgendamentoConfirmado';
+import Login from '@/paginas/Login';
+import Registro from '@/paginas/Registro';
+import Dashboard from '@/paginas/Dashboard';
+import Doacao from '@/paginas/Doacao';
+import Home from '@/paginas/Home';
+import CasaPassagen from '@/paginas/CasaPassagen';
+import NecessidadeCasa from '@/paginas/NecessidadeCasa';
+import ConfirmarAgendamento from '@/paginas/ConfirmarAgendamento';
+import AgendamentoConfirmado from '@/paginas/AgendamentoConfirmado';
 
-import AdminDashboard from './paginas/AdminDashboard';
-import AdminItens from './paginas/AdminItens';
+import AdminDashboard from '@/paginas/AdminDashboard';
+import AdminItens from '@/paginas/AdminItens';
 
 const App = () => {
   return (

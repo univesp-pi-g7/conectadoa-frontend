@@ -13,8 +13,8 @@ import {
 
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import Navbar from "../../componentes/Navbar";
-import { listarNecessidadesAbertas } from "../../servicos/necessidadeServico";
+import Navbar from "@/componentes/Navbar";
+import { listarNecessidadesAbertas } from "@/servicos/necessidadeServico";
 
 // Mapeamento de prioridade para label e cor da tag
 const PRIORIDADE_CONFIG = {

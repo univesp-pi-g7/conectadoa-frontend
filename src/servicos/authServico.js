@@ -7,7 +7,7 @@
  * Todas as funções são async e usam a instância do axios configurada em api.js.
  */
 import { AxiosError } from 'axios';
-import api from './api';
+import api from '@/servicos/api';
 
 // Chave usada para armazenar o token no localStorage
 const CHAVE_TOKEN = 'conectadoa_token';

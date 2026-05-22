@@ -17,10 +17,10 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
 // Provedor de autenticação
-import { AuthProvider } from './contextos/AuthContexto';
+import { AuthProvider } from '@/contextos/AuthContexto';
 
 // Componente raiz
-import App from './App.jsx';
+import App from '@/App.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

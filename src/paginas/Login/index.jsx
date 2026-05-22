@@ -28,7 +28,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 // Contexto de autenticação
-import { useAuth } from '../../contextos/AuthContexto';
+import { useAuth } from '@/contextos/AuthContexto';
 
 const Login = () => {
   const navegar = useNavigate();

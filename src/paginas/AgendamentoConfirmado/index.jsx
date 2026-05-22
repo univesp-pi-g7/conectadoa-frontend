@@ -18,8 +18,8 @@ import StarIcon from '@mui/icons-material/Star';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
-import Navbar from '../../componentes/Navbar';
-import { useAuth } from '../../contextos/AuthContexto';
+import Navbar from '@/componentes/Navbar';
+import { useAuth } from '@/contextos/AuthContexto';
 
 const AgendamentoConfirmado = () => {
   const { usuario } = useAuth();
